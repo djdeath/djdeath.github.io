@@ -1,0 +1,5658 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+
+    <title>NoFlo Development Environment v0.1.8</title>
+    <link rel="shortcut icon" href="noflo.ico">
+    <link href="https://github.com/noflo/noflo-ui" rel="source">
+    <meta name="description" content="Flow-Based Programming Environment">
+
+    <script src="bower_components/platform/platform.js"></script>
+    <!--
+Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<script src="bower_components/polymer/polymer.js"></script>
+<!--
+Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<polymer-element name="polymer-body" extends="body" assetpath="bower_components/polymer/">
+
+</polymer-element>
+
+<!--<link rel="import" href="../polymer-dev/polymer.html">--> 
+
+    <script src="bower_components/klay-js/klay.js"></script>
+    <script src="bower_components/hammerjs/hammer.js"></script>
+    <script src="bower_components/react/react.js"></script>
+    <script src="browser/noflo-noflo-indexeddb/vendor/IndexedDBShim.min.js"></script>
+
+    <polymer-element name="the-graph" attributes="graph menus library width height autolayout theme selectedNodes selectedEdges animatedEdges getMenuDef pan scale" assetpath="bower_components/the-graph/the-graph/">
+
+  <template>
+    <style>.the-graph-dark .the-graph-app {
+  background-color: #000;
+  position: relative;
+}
+.the-graph-dark .app-canvas,
+.the-graph-dark .app-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.the-graph-dark svg {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.the-graph-dark .arrow {
+  cursor: default;
+}
+.the-graph-dark .click {
+  cursor: pointer;
+}
+.the-graph-dark .drag {
+  cursor: pointer;
+  cursor: -moz-grab;
+  cursor: -webkit-grab;
+  cursor: grab;
+}
+.the-graph-dark .node-border {
+  fill: rgba(0,0,0,0.5);
+  stroke: #666;
+  stroke-width: 2px;
+}
+.the-graph-dark .node-rect {
+  fill: rgba(230,238,240,0.94);
+  stroke: none;
+}
+.the-graph-dark .node:hover .node-rect {
+  fill: rgba(230,238,240,0.97);
+}
+.the-graph-dark .node:hover .node-border {
+  stroke: #808080;
+}
+.the-graph-dark .node:hover .port-arc {
+  fill: #808080;
+}
+.the-graph-dark .ex-inports .node-border {
+  fill: #1a1a1a;
+  stroke: none;
+}
+.the-graph-dark .ex-outports .node-border {
+  fill: #1a1a1a;
+  stroke: none;
+}
+.the-graph-dark .ex-inports .node .node-rect,
+.the-graph-dark .ex-outports .node .node-rect,
+.the-graph-dark .ex-inports .node:hover .node-rect,
+.the-graph-dark .ex-outports .node:hover .node-rect {
+  fill: none;
+}
+.the-graph-dark .selection .ex-inports .node .node-border,
+.the-graph-dark .selection .ex-outports .node .node-border {
+  fill: #1a1a1a;
+}
+.the-graph-dark .small .node-border {
+  fill: rgba(230,238,240,0.94);
+  stroke: none;
+}
+.the-graph-dark .small .ex-inports .node .node-border,
+.the-graph-dark .small .ex-outports .node .node-border {
+  fill: #1a1a1a;
+}
+.the-graph-dark .node-bg {
+  opacity: 0;
+}
+.the-graph-dark .selection .node .node-rect {
+  fill: rgba(61,66,67,0.94);
+}
+.the-graph-dark .selection .node .node-border {
+  stroke: #232829;
+}
+.the-graph-dark .selection .node .port-arc {
+  fill: #232829;
+}
+.the-graph-dark .selection .node .node-icon {
+  fill: #232829;
+}
+.the-graph-dark .selection .node.selected .node-rect {
+  fill: rgba(230,238,240,0.94);
+}
+.the-graph-dark .selection .node.selected .node-border {
+  stroke: #808080;
+}
+.the-graph-dark .selection .node.selected .port-arc {
+  fill: #808080;
+}
+.the-graph-dark .selection .node.selected .node-icon {
+  fill: #5e6a6e;
+}
+.the-graph-dark .selection .ex-inports .node .node-icon {
+  fill: #512f01;
+}
+.the-graph-dark .selection .ex-outports .node .node-icon {
+  fill: #015115;
+}
+.the-graph-dark .small .selection .node .node-rect {
+  fill: none;
+}
+.the-graph-dark .small .selection .node .node-border {
+  fill: rgba(61,66,67,0.94);
+  stroke: none;
+}
+.the-graph-dark .small .selection .node.selected .node-rect {
+  fill: none;
+}
+.the-graph-dark .small .selection .node.selected .node-border {
+  fill: rgba(230,238,240,0.94);
+  stroke: none;
+}
+.the-graph-dark path {
+  fill: none;
+}
+.the-graph-dark .edge-bg {
+  stroke: #000;
+  stroke-width: 5px;
+}
+.the-graph-dark .edge-fg {
+  stroke: #fff;
+  stroke-width: 3px;
+  transition-property: stroke-width;
+  transition-duration: 0.5s;
+}
+.the-graph-dark .edge-touch {
+  stroke-width: 7px;
+  opacity: 0;
+}
+.the-graph-dark .edge:hover .edge-bg {
+  stroke: #808080;
+}
+.the-graph-dark .edge.selected .edge-bg {
+  stroke-width: 8px;
+  stroke: #e6e6e6;
+}
+.the-graph-dark .small .edge-bg {
+  stroke-width: 8px;
+}
+.the-graph-dark .small .edge-fg {
+  stroke-width: 6px;
+}
+@-webkit-keyframes heartbeats {
+  0% {
+    stroke-width: 12px;
+  }
+
+  10% {
+    stroke-width: 18px;
+  }
+
+  30% {
+    stroke-width: 12px;
+  }
+
+  40% {
+    stroke-width: 18px;
+  }
+
+  60% {
+    stroke-width: 12px;
+  }
+}
+@-moz-keyframes heartbeats {
+  0% {
+    stroke-width: 12px;
+  }
+
+  10% {
+    stroke-width: 18px;
+  }
+
+  30% {
+    stroke-width: 12px;
+  }
+
+  40% {
+    stroke-width: 18px;
+  }
+
+  60% {
+    stroke-width: 12px;
+  }
+}
+@-o-keyframes heartbeats {
+  0% {
+    stroke-width: 12px;
+  }
+
+  10% {
+    stroke-width: 18px;
+  }
+
+  30% {
+    stroke-width: 12px;
+  }
+
+  40% {
+    stroke-width: 18px;
+  }
+
+  60% {
+    stroke-width: 12px;
+  }
+}
+.the-graph-dark .edge.animated .edge-bg {
+  stroke-linecap: round;
+  stroke-width: 12px;
+  stroke: #e6e6e6;
+  -webkit-animation: heartbeats 1s linear infinite;
+  -moz-animation: heartbeats 1s linear infinite;
+  -o-animation: heartbeats 1s linear infinite;
+  animation: heartbeats 1s linear infinite;
+}
+.the-graph-dark text {
+  font-family: "SourceCodePro", "Source Code Pro", Helvetica, Arial, sans-serif;
+  text-rendering: geometricPrecision;
+/* makes text scale smoothly */
+  font-size: 14px;
+  fill: #fff;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+.the-graph-dark .text-bg-rect {
+  fill: rgba(0,0,0,0.5);
+}
+.the-graph-dark .node-label,
+.the-graph-dark .node-sublabel {
+  text-anchor: middle;
+}
+.the-graph-dark .small .node-label-bg {
+  visibility: hidden;
+}
+.the-graph-dark .node-sublabel {
+  font-size: 9px;
+}
+.the-graph-dark .node-sublabel-bg {
+  visibility: hidden;
+}
+.the-graph-dark .big .node-sublabel-bg {
+  visibility: visible;
+}
+.the-graph-dark .iip-path {
+  stroke-width: 1px;
+  stroke: #fff;
+}
+.the-graph-dark .iip-info {
+  visibility: hidden;
+}
+.the-graph-dark .iip-info .text-bg-text {
+  font-size: 5px;
+  text-anchor: end;
+}
+.the-graph-dark .big .iip-info {
+  visibility: visible;
+}
+.the-graph-dark .context-modal-bg {
+  fill: rgba(0,0,0,0.5);
+}
+.the-graph-dark .context-node-rect {
+  fill: #121417;
+  stroke: #bfbfbf;
+  stroke-width: 0.5px;
+}
+.the-graph-dark .context-node-icon {
+  font-size: 30px;
+  fill: #fff;
+}
+.the-graph-dark .context-icon {
+  font-size: 20px;
+  fill: #fff;
+}
+.the-graph-dark .context-node-label {
+  text-anchor: middle;
+}
+.the-graph-dark .context-arc {
+  stroke-width: 72px;
+  stroke: rgba(43,48,54,0.95);
+}
+.the-graph-dark .context-slice.click:hover .context-arc {
+  stroke: rgba(90,102,114,0.95);
+}
+.the-graph-dark .context-circle {
+  stroke: #bfbfbf;
+  fill: none;
+  stroke-width: 1.5px;
+}
+.the-graph-dark .context-circle-x {
+  stroke: #bfbfbf;
+  fill: none;
+  stroke-width: 1px;
+}
+.the-graph-dark .context-arc-icon-label {
+  font-size: 12px;
+}
+.the-graph-dark .context-port-bg {
+  fill: rgba(43,48,54,0.95);
+}
+.the-graph-dark .context-port-bg.highlight {
+  stroke: #bfbfbf;
+  stroke-width: 1px;
+}
+.the-graph-dark .context-port-hole {
+  stroke-width: 2px;
+  fill: rgba(43,48,54,0.95);
+  stroke: #bfbfbf;
+}
+.the-graph-dark .context-port-path {
+  stroke: #bfbfbf;
+}
+.the-graph-dark .context-port-label {
+  fill: #fff;
+  dominant-baseline: central;
+}
+.the-graph-dark .context-port-in .context-port-label {
+  text-anchor: end;
+}
+.the-graph-dark .context-port-out .context-port-label {
+  text-anchor: start;
+}
+.the-graph-dark .context-edge-label-out {
+  text-anchor: end;
+  dominant-baseline: central;
+}
+.the-graph-dark .context-edge-label-in {
+  text-anchor: start;
+  dominant-baseline: central;
+}
+.the-graph-dark .tooltip {
+  opacity: 1;
+  transition-property: opacity;
+  transition-duration: 0.3s;
+}
+.the-graph-dark .tooltip.hidden {
+  opacity: 0;
+}
+.the-graph-dark .tooltip-bg {
+  fill: rgba(0,0,0,0.9);
+  opacity: 0.75;
+}
+.the-graph-dark .tooltip-label {
+  text-anchor: start;
+  font-size: 10px;
+}
+.the-graph-dark .icon {
+  font-family: 'FontAwesomeSVG';
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+.the-graph-dark .node-icon {
+  font-size: 45px;
+  fill: #5e6a6e;
+  transition-property: font-size, fill;
+  transition-duration: 0.5s, 0.3s;
+}
+.the-graph-dark .small .node-icon {
+  fill: #2f3537;
+  font-size: 66px;
+}
+.the-graph-dark .big .node-icon {
+  fill: #c8ced0;
+}
+.the-graph-dark .ex-inports .node-icon,
+.the-graph-dark .small .ex-inports .node-icon {
+  fill: #e88802;
+}
+.the-graph-dark .ex-outports .node-icon,
+.the-graph-dark .small .ex-outports .node-icon {
+  fill: #02e83c;
+}
+.the-graph-dark .port-circle-bg {
+  fill: #666;
+  opacity: 0;
+}
+.the-graph-dark .port-arc {
+  fill: #666;
+}
+.the-graph-dark .port-circle-small {
+  fill: none;
+}
+.the-graph-dark .small .port-circle {
+  visibility: hidden;
+}
+.the-graph-dark .port-label {
+  fill: #0c0d0e;
+  visibility: hidden;
+  font-size: 6px;
+  dominant-baseline: central;
+}
+.the-graph-dark .inports .port-label {
+  text-anchor: start;
+}
+.the-graph-dark .outports .port-label {
+  text-anchor: end;
+}
+.the-graph-dark .big .port-label {
+  visibility: visible;
+}
+.the-graph-dark .big .ex-inports .port-label,
+.the-graph-dark .big .ex-outports .port-label {
+  visibility: hidden;
+}
+.the-graph-dark .group-box {
+  fill: rgba(191,191,191,0.15);
+  transition-property: fill;
+  transition-duration: 0.3s;
+}
+.the-graph-dark .group-box:hover {
+  fill: rgba(191,191,191,0.25);
+}
+.the-graph-dark .small .group-box {
+  stroke-width: 8px;
+}
+.the-graph-dark .group-box.color0 {
+  fill: rgba(191,191,191,0.15);
+  stroke: none;
+}
+.the-graph-dark .group-box.color1 {
+  fill: rgba(255,128,128,0.15);
+  stroke: none;
+}
+.the-graph-dark .group-box.color2 {
+  fill: rgba(255,202,128,0.15);
+  stroke: none;
+}
+.the-graph-dark .group-box.color3 {
+  fill: rgba(255,255,128,0.15);
+  stroke: none;
+}
+.the-graph-dark .group-box.color4 {
+  fill: rgba(128,255,159,0.15);
+  stroke: none;
+}
+.the-graph-dark .group-box.color5 {
+  fill: rgba(128,255,212,0.15);
+  stroke: none;
+}
+.the-graph-dark .group-box.color6 {
+  fill: rgba(128,244,255,0.15);
+  stroke: none;
+}
+.the-graph-dark .group-box.color7 {
+  fill: rgba(128,191,255,0.15);
+  stroke: none;
+}
+.the-graph-dark .group-box.color8 {
+  fill: rgba(223,128,255,0.15);
+  stroke: none;
+}
+.the-graph-dark .group-box.color9 {
+  fill: rgba(255,128,234,0.15);
+  stroke: none;
+}
+.the-graph-dark .group-box.color10 {
+  fill: rgba(255,128,181,0.15);
+  stroke: none;
+}
+.the-graph-dark .group-box.color0:hover {
+  fill: rgba(191,191,191,0.25);
+}
+.the-graph-dark .group-box.color1:hover {
+  fill: rgba(255,128,128,0.25);
+}
+.the-graph-dark .group-box.color2:hover {
+  fill: rgba(255,202,128,0.25);
+}
+.the-graph-dark .group-box.color3:hover {
+  fill: rgba(255,255,128,0.25);
+}
+.the-graph-dark .group-box.color4:hover {
+  fill: rgba(128,255,159,0.25);
+}
+.the-graph-dark .group-box.color5:hover {
+  fill: rgba(128,255,212,0.25);
+}
+.the-graph-dark .group-box.color6:hover {
+  fill: rgba(128,244,255,0.25);
+}
+.the-graph-dark .group-box.color7:hover {
+  fill: rgba(128,191,255,0.25);
+}
+.the-graph-dark .group-box.color8:hover {
+  fill: rgba(223,128,255,0.25);
+}
+.the-graph-dark .group-box.color9:hover {
+  fill: rgba(255,128,234,0.25);
+}
+.the-graph-dark .group-box.color10:hover {
+  fill: rgba(255,128,181,0.25);
+}
+.the-graph-dark .selection .group-box.color0 {
+  fill: rgba(191,191,191,0.1);
+}
+.the-graph-dark .selection .group-box.color1 {
+  fill: rgba(255,128,128,0.1);
+}
+.the-graph-dark .selection .group-box.color2 {
+  fill: rgba(255,202,128,0.1);
+}
+.the-graph-dark .selection .group-box.color3 {
+  fill: rgba(255,255,128,0.1);
+}
+.the-graph-dark .selection .group-box.color4 {
+  fill: rgba(128,255,159,0.1);
+}
+.the-graph-dark .selection .group-box.color5 {
+  fill: rgba(128,255,212,0.1);
+}
+.the-graph-dark .selection .group-box.color6 {
+  fill: rgba(128,244,255,0.1);
+}
+.the-graph-dark .selection .group-box.color7 {
+  fill: rgba(128,191,255,0.1);
+}
+.the-graph-dark .selection .group-box.color8 {
+  fill: rgba(223,128,255,0.1);
+}
+.the-graph-dark .selection .group-box.color9 {
+  fill: rgba(255,128,234,0.1);
+}
+.the-graph-dark .selection .group-box.color10 {
+  fill: rgba(255,128,181,0.1);
+}
+.the-graph-dark .selection .group-box.selection {
+  fill: rgba(255,255,255,0.15);
+  stroke: #e6e6e6;
+  stroke-width: 1px;
+}
+.the-graph-dark .selection .group-box.selection:hover {
+  fill: rgba(255,255,255,0.25);
+}
+.the-graph-dark .group-label {
+  text-anchor: start;
+  fill: #fff;
+  font-size: 20px;
+  transition-property: font-size;
+  transition-duration: 0.5s;
+}
+.the-graph-dark .small .group-label {
+  font-size: 30px;
+  transition-property: font-size;
+  transition-duration: 0.5s;
+}
+.the-graph-dark .group-description {
+  fill: #fff;
+  font-size: 12px;
+  text-anchor: start;
+}
+.the-graph-dark .small .group-description {
+  visibility: hidden;
+}
+.the-graph-dark .stroke,
+.the-graph-dark .stroke.route0,
+.the-graph-dark .selection .selected .stroke,
+.the-graph-dark .selection .selected .stroke.route0 {
+  stroke: #fff;
+}
+.the-graph-dark .stroke.route1,
+.the-graph-dark .selection .selected .stroke.route1 {
+  stroke: #e80202;
+}
+.the-graph-dark .stroke.route2,
+.the-graph-dark .selection .selected .stroke.route2 {
+  stroke: #e88802;
+}
+.the-graph-dark .stroke.route3,
+.the-graph-dark .selection .selected .stroke.route3 {
+  stroke: #e8e802;
+}
+.the-graph-dark .stroke.route4,
+.the-graph-dark .selection .selected .stroke.route4 {
+  stroke: #02e83c;
+}
+.the-graph-dark .stroke.route5,
+.the-graph-dark .selection .selected .stroke.route5 {
+  stroke: #02e89c;
+}
+.the-graph-dark .stroke.route6,
+.the-graph-dark .selection .selected .stroke.route6 {
+  stroke: #02d5e8;
+}
+.the-graph-dark .stroke.route7,
+.the-graph-dark .selection .selected .stroke.route7 {
+  stroke: #0275e8;
+}
+.the-graph-dark .stroke.route8,
+.the-graph-dark .selection .selected .stroke.route8 {
+  stroke: #af02e8;
+}
+.the-graph-dark .stroke.route9,
+.the-graph-dark .selection .selected .stroke.route9 {
+  stroke: #e802c2;
+}
+.the-graph-dark .stroke.route10,
+.the-graph-dark .selection .selected .stroke.route10 {
+  stroke: #e80262;
+}
+.the-graph-dark .selection .stroke,
+.the-graph-dark .selection .stroke.route0 {
+  stroke: #757575;
+}
+.the-graph-dark .selection .stroke.route1 {
+  stroke: #510101;
+}
+.the-graph-dark .selection .stroke.route2 {
+  stroke: #512f01;
+}
+.the-graph-dark .selection .stroke.route3 {
+  stroke: #515101;
+}
+.the-graph-dark .selection .stroke.route4 {
+  stroke: #015115;
+}
+.the-graph-dark .selection .stroke.route5 {
+  stroke: #015136;
+}
+.the-graph-dark .selection .stroke.route6 {
+  stroke: #014a51;
+}
+.the-graph-dark .selection .stroke.route7 {
+  stroke: #012951;
+}
+.the-graph-dark .selection .stroke.route8 {
+  stroke: #3d0151;
+}
+.the-graph-dark .selection .stroke.route9 {
+  stroke: #510143;
+}
+.the-graph-dark .selection .stroke.route10 {
+  stroke: #510122;
+}
+.the-graph-dark .fill.route0 {
+  fill: #fff;
+}
+.the-graph-dark .fill.route1 {
+  fill: #e80202;
+}
+.the-graph-dark .fill.route2 {
+  fill: #e88802;
+}
+.the-graph-dark .fill.route3 {
+  fill: #e8e802;
+}
+.the-graph-dark .fill.route4 {
+  fill: #02e83c;
+}
+.the-graph-dark .fill.route5 {
+  fill: #02e89c;
+}
+.the-graph-dark .fill.route6 {
+  fill: #02d5e8;
+}
+.the-graph-dark .fill.route7 {
+  fill: #0275e8;
+}
+.the-graph-dark .fill.route8 {
+  fill: #af02e8;
+}
+.the-graph-dark .fill.route9 {
+  fill: #e802c2;
+}
+.the-graph-dark .fill.route10 {
+  fill: #e80262;
+}
+@-moz-keyframes heartbeats {
+  0% {
+    stroke-width: 12px;
+  }
+
+  10% {
+    stroke-width: 18px;
+  }
+
+  30% {
+    stroke-width: 12px;
+  }
+
+  40% {
+    stroke-width: 18px;
+  }
+
+  60% {
+    stroke-width: 12px;
+  }
+}
+@-webkit-keyframes heartbeats {
+  0% {
+    stroke-width: 12px;
+  }
+
+  10% {
+    stroke-width: 18px;
+  }
+
+  30% {
+    stroke-width: 12px;
+  }
+
+  40% {
+    stroke-width: 18px;
+  }
+
+  60% {
+    stroke-width: 12px;
+  }
+}
+@-o-keyframes heartbeats {
+  0% {
+    stroke-width: 12px;
+  }
+
+  10% {
+    stroke-width: 18px;
+  }
+
+  30% {
+    stroke-width: 12px;
+  }
+
+  40% {
+    stroke-width: 18px;
+  }
+
+  60% {
+    stroke-width: 12px;
+  }
+}
+@-ms-keyframes heartbeats {
+  0% {
+    stroke-width: 12px;
+  }
+
+  10% {
+    stroke-width: 18px;
+  }
+
+  30% {
+    stroke-width: 12px;
+  }
+
+  40% {
+    stroke-width: 18px;
+  }
+
+  60% {
+    stroke-width: 12px;
+  }
+}
+@keyframes heartbeats {
+  0% {
+    stroke-width: 12px;
+  }
+
+  10% {
+    stroke-width: 18px;
+  }
+
+  30% {
+    stroke-width: 12px;
+  }
+
+  40% {
+    stroke-width: 18px;
+  }
+
+  60% {
+    stroke-width: 12px;
+  }
+}
+</style>
+    <style>.the-graph-light .the-graph-app {
+  background-color: #fff;
+  position: relative;
+}
+.the-graph-light .app-canvas,
+.the-graph-light .app-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.the-graph-light svg {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.the-graph-light .arrow {
+  cursor: default;
+}
+.the-graph-light .click {
+  cursor: pointer;
+}
+.the-graph-light .drag {
+  cursor: pointer;
+  cursor: -moz-grab;
+  cursor: -webkit-grab;
+  cursor: grab;
+}
+.the-graph-light .node-border {
+  fill: rgba(255,255,255,0.5);
+  stroke: #3b4245;
+  stroke-width: 2px;
+}
+.the-graph-light .node-rect {
+  fill: rgba(230,238,240,0.94);
+  stroke: none;
+}
+.the-graph-light .node:hover .node-rect {
+  fill: rgba(230,238,240,0.97);
+}
+.the-graph-light .node:hover .node-border {
+  stroke: #808080;
+}
+.the-graph-light .node:hover .port-arc {
+  fill: #808080;
+}
+.the-graph-light .ex-inports .node-border {
+  fill: #e6e6e6;
+  stroke: none;
+}
+.the-graph-light .ex-outports .node-border {
+  fill: #e6e6e6;
+  stroke: none;
+}
+.the-graph-light .ex-inports .node .node-rect,
+.the-graph-light .ex-outports .node .node-rect,
+.the-graph-light .ex-inports .node:hover .node-rect,
+.the-graph-light .ex-outports .node:hover .node-rect {
+  fill: none;
+}
+.the-graph-light .selection .ex-inports .node .node-border,
+.the-graph-light .selection .ex-outports .node .node-border {
+  fill: #e6e6e6;
+}
+.the-graph-light .small .node-border {
+  fill: rgba(230,238,240,0.94);
+  stroke: none;
+}
+.the-graph-light .small .ex-inports .node .node-border,
+.the-graph-light .small .ex-outports .node .node-border {
+  fill: #e6e6e6;
+}
+.the-graph-light .node-bg {
+  opacity: 0;
+}
+.the-graph-light .selection .node .node-rect {
+  fill: rgba(245,248,249,0.94);
+}
+.the-graph-light .selection .node .node-border {
+  stroke: #d6dadc;
+}
+.the-graph-light .selection .node .port-arc {
+  fill: #d6dadc;
+}
+.the-graph-light .selection .node .node-icon {
+  fill: #bac2c4;
+}
+.the-graph-light .selection .node.selected .node-rect {
+  fill: rgba(230,238,240,0.94);
+}
+.the-graph-light .selection .node.selected .node-border {
+  stroke: #808080;
+}
+.the-graph-light .selection .node.selected .port-arc {
+  fill: #808080;
+}
+.the-graph-light .selection .node.selected .node-icon {
+  fill: #2f3537;
+}
+.the-graph-light .selection .ex-inports .node .node-icon {
+  fill: #ffe5cc;
+}
+.the-graph-light .selection .ex-outports .node .node-icon {
+  fill: #ccffdb;
+}
+.the-graph-light .small .selection .node .node-rect {
+  fill: none;
+}
+.the-graph-light .small .selection .node .node-border {
+  fill: rgba(245,248,249,0.94);
+  stroke: none;
+}
+.the-graph-light .small .selection .node.selected .node-rect {
+  fill: none;
+}
+.the-graph-light .small .selection .node.selected .node-border {
+  fill: rgba(230,238,240,0.94);
+  stroke: none;
+}
+.the-graph-light path {
+  fill: none;
+}
+.the-graph-light .edge-bg {
+  stroke: #e6e6e6;
+  stroke-width: 6px;
+}
+.the-graph-light .edge-fg {
+  stroke: #bfbfbf;
+  stroke-width: 4px;
+  transition-property: stroke-width;
+  transition-duration: 0.5s;
+}
+.the-graph-light .edge-touch {
+  stroke-width: 8px;
+  opacity: 0;
+}
+.the-graph-light .edge:hover .edge-bg {
+  stroke: #808080;
+}
+.the-graph-light .edge.selected .edge-bg {
+  stroke-width: 10px;
+  stroke: #808080;
+}
+.the-graph-light .small .edge-bg {
+  stroke-width: 10px;
+}
+.the-graph-light .small .edge-fg {
+  stroke-width: 8px;
+}
+@-webkit-keyframes heartbeats {
+  0% {
+    stroke-width: 16px;
+  }
+
+  10% {
+    stroke-width: 24px;
+  }
+
+  30% {
+    stroke-width: 16px;
+  }
+
+  40% {
+    stroke-width: 24px;
+  }
+
+  60% {
+    stroke-width: 16px;
+  }
+}
+@-moz-keyframes heartbeats {
+  0% {
+    stroke-width: 16px;
+  }
+
+  10% {
+    stroke-width: 24px;
+  }
+
+  30% {
+    stroke-width: 16px;
+  }
+
+  40% {
+    stroke-width: 24px;
+  }
+
+  60% {
+    stroke-width: 16px;
+  }
+}
+@-o-keyframes heartbeats {
+  0% {
+    stroke-width: 16px;
+  }
+
+  10% {
+    stroke-width: 24px;
+  }
+
+  30% {
+    stroke-width: 16px;
+  }
+
+  40% {
+    stroke-width: 24px;
+  }
+
+  60% {
+    stroke-width: 16px;
+  }
+}
+.the-graph-light .edge.animated .edge-bg {
+  stroke-linecap: round;
+  stroke-width: 16px;
+  stroke: #808080;
+  -webkit-animation: heartbeats 1s linear infinite;
+  -moz-animation: heartbeats 1s linear infinite;
+  -o-animation: heartbeats 1s linear infinite;
+  animation: heartbeats 1s linear infinite;
+}
+.the-graph-light text {
+  font-family: "SourceCodePro", "Source Code Pro", Helvetica, Arial, sans-serif;
+  text-rendering: geometricPrecision;
+/* makes text scale smoothly */
+  font-size: 14px;
+  fill: #000;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+.the-graph-light .text-bg-rect {
+  fill: rgba(255,255,255,0.5);
+}
+.the-graph-light .node-label,
+.the-graph-light .node-sublabel {
+  text-anchor: middle;
+}
+.the-graph-light .small .node-label-bg {
+  visibility: hidden;
+}
+.the-graph-light .node-sublabel {
+  font-size: 9px;
+}
+.the-graph-light .node-sublabel-bg {
+  visibility: hidden;
+}
+.the-graph-light .big .node-sublabel-bg {
+  visibility: visible;
+}
+.the-graph-light .iip-path {
+  stroke-width: 1px;
+  stroke: #bfbfbf;
+}
+.the-graph-light .iip-info {
+  visibility: hidden;
+}
+.the-graph-light .iip-info .text-bg-text {
+  font-size: 5px;
+  text-anchor: end;
+}
+.the-graph-light .big .iip-info {
+  visibility: visible;
+}
+.the-graph-light .context-modal-bg {
+  fill: rgba(255,255,255,0.5);
+}
+.the-graph-light .context-node-rect {
+  fill: #e0e3e6;
+  stroke: #404040;
+  stroke-width: 0.5px;
+}
+.the-graph-light .context-node-icon {
+  font-size: 30px;
+  fill: #000;
+}
+.the-graph-light .context-icon {
+  font-size: 20px;
+  fill: #000;
+}
+.the-graph-light .context-node-label {
+  text-anchor: middle;
+}
+.the-graph-light .context-arc {
+  stroke-width: 72px;
+  stroke: rgba(224,227,230,0.95);
+}
+.the-graph-light .context-slice.click:hover .context-arc {
+  stroke: rgba(195,201,208,0.95);
+}
+.the-graph-light .context-circle {
+  stroke: #404040;
+  fill: none;
+  stroke-width: 1.5px;
+}
+.the-graph-light .context-circle-x {
+  stroke: #404040;
+  fill: none;
+  stroke-width: 1px;
+}
+.the-graph-light .context-arc-icon-label {
+  font-size: 12px;
+}
+.the-graph-light .context-port-bg {
+  fill: rgba(224,227,230,0.95);
+}
+.the-graph-light .context-port-bg.highlight {
+  stroke: #404040;
+  stroke-width: 1px;
+}
+.the-graph-light .context-port-hole {
+  stroke-width: 2px;
+  fill: rgba(224,227,230,0.95);
+  stroke: #404040;
+}
+.the-graph-light .context-port-path {
+  stroke: #404040;
+}
+.the-graph-light .context-port-label {
+  fill: #000;
+  dominant-baseline: central;
+}
+.the-graph-light .context-port-in .context-port-label {
+  text-anchor: end;
+}
+.the-graph-light .context-port-out .context-port-label {
+  text-anchor: start;
+}
+.the-graph-light .context-edge-label-out {
+  text-anchor: end;
+  dominant-baseline: central;
+}
+.the-graph-light .context-edge-label-in {
+  text-anchor: start;
+  dominant-baseline: central;
+}
+.the-graph-light .tooltip {
+  opacity: 1;
+  transition-property: opacity;
+  transition-duration: 0.3s;
+}
+.the-graph-light .tooltip.hidden {
+  opacity: 0;
+}
+.the-graph-light .tooltip-bg {
+  fill: rgba(255,255,255,0.9);
+  opacity: 0.75;
+}
+.the-graph-light .tooltip-label {
+  text-anchor: start;
+  font-size: 10px;
+}
+.the-graph-light .icon {
+  font-family: 'FontAwesomeSVG';
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+.the-graph-light .node-icon {
+  font-size: 45px;
+  fill: #3b4245;
+  transition-property: font-size, fill;
+  transition-duration: 0.5s, 0.3s;
+}
+.the-graph-light .small .node-icon {
+  fill: #171b1c;
+  font-size: 66px;
+}
+.the-graph-light .big .node-icon {
+  fill: #c8ced0;
+}
+.the-graph-light .ex-inports .node-icon,
+.the-graph-light .small .ex-inports .node-icon {
+  fill: #cc6300;
+}
+.the-graph-light .ex-outports .node-icon,
+.the-graph-light .small .ex-outports .node-icon {
+  fill: #00cc3d;
+}
+.the-graph-light .port-circle-bg {
+  fill: #3b4245;
+  opacity: 0;
+}
+.the-graph-light .port-arc {
+  fill: #3b4245;
+}
+.the-graph-light .port-circle-small {
+  fill: none;
+}
+.the-graph-light .small .port-circle {
+  visibility: hidden;
+}
+.the-graph-light .port-label {
+  fill: #0c0d0e;
+  visibility: hidden;
+  font-size: 6px;
+  dominant-baseline: central;
+}
+.the-graph-light .inports .port-label {
+  text-anchor: start;
+}
+.the-graph-light .outports .port-label {
+  text-anchor: end;
+}
+.the-graph-light .big .port-label {
+  visibility: visible;
+}
+.the-graph-light .big .ex-inports .port-label,
+.the-graph-light .big .ex-outports .port-label {
+  visibility: hidden;
+}
+.the-graph-light .group-box {
+  fill: rgba(191,191,191,0.05);
+  transition-property: fill;
+  transition-duration: 0.3s;
+}
+.the-graph-light .group-box:hover {
+  fill: rgba(191,191,191,0.15);
+}
+.the-graph-light .small .group-box {
+  stroke-width: 8px;
+}
+.the-graph-light .group-box.color0 {
+  fill: rgba(191,191,191,0.05);
+  stroke: rgba(191,191,191,0.15);
+}
+.the-graph-light .group-box.color1 {
+  fill: rgba(204,0,0,0.05);
+  stroke: rgba(204,0,0,0.15);
+}
+.the-graph-light .group-box.color2 {
+  fill: rgba(204,99,0,0.05);
+  stroke: rgba(204,99,0,0.15);
+}
+.the-graph-light .group-box.color3 {
+  fill: rgba(255,200,0,0.05);
+  stroke: rgba(255,200,0,0.15);
+}
+.the-graph-light .group-box.color4 {
+  fill: rgba(0,204,61,0.05);
+  stroke: rgba(0,204,61,0.15);
+}
+.the-graph-light .group-box.color5 {
+  fill: rgba(171,242,218,0.05);
+  stroke: rgba(171,242,218,0.15);
+}
+.the-graph-light .group-box.color6 {
+  fill: rgba(0,201,204,0.05);
+  stroke: rgba(0,201,204,0.15);
+}
+.the-graph-light .group-box.color7 {
+  fill: rgba(0,82,204,0.05);
+  stroke: rgba(0,82,204,0.15);
+}
+.the-graph-light .group-box.color8 {
+  fill: rgba(68,0,204,0.05);
+  stroke: rgba(68,0,204,0.15);
+}
+.the-graph-light .group-box.color9 {
+  fill: rgba(255,168,186,0.05);
+  stroke: rgba(255,168,186,0.15);
+}
+.the-graph-light .group-box.color10 {
+  fill: rgba(204,0,109,0.05);
+  stroke: rgba(204,0,109,0.15);
+}
+.the-graph-light .group-box.color0:hover {
+  fill: rgba(191,191,191,0.15);
+}
+.the-graph-light .group-box.color1:hover {
+  fill: rgba(204,0,0,0.15);
+}
+.the-graph-light .group-box.color2:hover {
+  fill: rgba(204,99,0,0.15);
+}
+.the-graph-light .group-box.color3:hover {
+  fill: rgba(255,200,0,0.15);
+}
+.the-graph-light .group-box.color4:hover {
+  fill: rgba(0,204,61,0.15);
+}
+.the-graph-light .group-box.color5:hover {
+  fill: rgba(171,242,218,0.15);
+}
+.the-graph-light .group-box.color6:hover {
+  fill: rgba(0,201,204,0.15);
+}
+.the-graph-light .group-box.color7:hover {
+  fill: rgba(0,82,204,0.15);
+}
+.the-graph-light .group-box.color8:hover {
+  fill: rgba(68,0,204,0.15);
+}
+.the-graph-light .group-box.color9:hover {
+  fill: rgba(255,168,186,0.15);
+}
+.the-graph-light .group-box.color10:hover {
+  fill: rgba(204,0,109,0.15);
+}
+.the-graph-light .selection .group-box.color0 {
+  fill: rgba(191,191,191,0.01);
+}
+.the-graph-light .selection .group-box.color1 {
+  fill: rgba(204,0,0,0.01);
+}
+.the-graph-light .selection .group-box.color2 {
+  fill: rgba(204,99,0,0.01);
+}
+.the-graph-light .selection .group-box.color3 {
+  fill: rgba(255,200,0,0.01);
+}
+.the-graph-light .selection .group-box.color4 {
+  fill: rgba(0,204,61,0.01);
+}
+.the-graph-light .selection .group-box.color5 {
+  fill: rgba(171,242,218,0.01);
+}
+.the-graph-light .selection .group-box.color6 {
+  fill: rgba(0,201,204,0.01);
+}
+.the-graph-light .selection .group-box.color7 {
+  fill: rgba(0,82,204,0.01);
+}
+.the-graph-light .selection .group-box.color8 {
+  fill: rgba(68,0,204,0.01);
+}
+.the-graph-light .selection .group-box.color9 {
+  fill: rgba(255,168,186,0.01);
+}
+.the-graph-light .selection .group-box.color10 {
+  fill: rgba(204,0,109,0.01);
+}
+.the-graph-light .selection .group-box.selection {
+  fill: rgba(128,128,128,0.15);
+  stroke: #808080;
+  stroke-width: 1px;
+}
+.the-graph-light .selection .group-box.selection:hover {
+  fill: rgba(102,102,102,0.25);
+}
+.the-graph-light .group-label {
+  text-anchor: start;
+  fill: #000;
+  font-size: 20px;
+  transition-property: font-size;
+  transition-duration: 0.5s;
+}
+.the-graph-light .small .group-label {
+  font-size: 30px;
+  transition-property: font-size;
+  transition-duration: 0.5s;
+}
+.the-graph-light .group-description {
+  fill: #000;
+  font-size: 12px;
+  text-anchor: start;
+}
+.the-graph-light .small .group-description {
+  visibility: hidden;
+}
+.the-graph-light .stroke,
+.the-graph-light .stroke.route0,
+.the-graph-light .selection .selected .stroke,
+.the-graph-light .selection .selected .stroke.route0 {
+  stroke: #bfbfbf;
+}
+.the-graph-light .stroke.route1,
+.the-graph-light .selection .selected .stroke.route1 {
+  stroke: #c00;
+}
+.the-graph-light .stroke.route2,
+.the-graph-light .selection .selected .stroke.route2 {
+  stroke: #cc6300;
+}
+.the-graph-light .stroke.route3,
+.the-graph-light .selection .selected .stroke.route3 {
+  stroke: #ffc800;
+}
+.the-graph-light .stroke.route4,
+.the-graph-light .selection .selected .stroke.route4 {
+  stroke: #00cc3d;
+}
+.the-graph-light .stroke.route5,
+.the-graph-light .selection .selected .stroke.route5 {
+  stroke: #abf2da;
+}
+.the-graph-light .stroke.route6,
+.the-graph-light .selection .selected .stroke.route6 {
+  stroke: #00c9cc;
+}
+.the-graph-light .stroke.route7,
+.the-graph-light .selection .selected .stroke.route7 {
+  stroke: #0052cc;
+}
+.the-graph-light .stroke.route8,
+.the-graph-light .selection .selected .stroke.route8 {
+  stroke: #40c;
+}
+.the-graph-light .stroke.route9,
+.the-graph-light .selection .selected .stroke.route9 {
+  stroke: #ffa8ba;
+}
+.the-graph-light .stroke.route10,
+.the-graph-light .selection .selected .stroke.route10 {
+  stroke: #cc006d;
+}
+.the-graph-light .selection .stroke,
+.the-graph-light .selection .stroke.route0 {
+  stroke: #e6e6e6;
+}
+.the-graph-light .selection .stroke.route1 {
+  stroke: #fcc;
+}
+.the-graph-light .selection .stroke.route2 {
+  stroke: #ffe5cc;
+}
+.the-graph-light .selection .stroke.route3 {
+  stroke: #fff4cc;
+}
+.the-graph-light .selection .stroke.route4 {
+  stroke: #ccffdb;
+}
+.the-graph-light .selection .stroke.route5 {
+  stroke: #d3f8ec;
+}
+.the-graph-light .selection .stroke.route6 {
+  stroke: #ccfeff;
+}
+.the-graph-light .selection .stroke.route7 {
+  stroke: #cce0ff;
+}
+.the-graph-light .selection .stroke.route8 {
+  stroke: #dcf;
+}
+.the-graph-light .selection .stroke.route9 {
+  stroke: #ffccd6;
+}
+.the-graph-light .selection .stroke.route10 {
+  stroke: #ffcce7;
+}
+.the-graph-light .fill.route0 {
+  fill: #bfbfbf;
+}
+.the-graph-light .fill.route1 {
+  fill: #c00;
+}
+.the-graph-light .fill.route2 {
+  fill: #cc6300;
+}
+.the-graph-light .fill.route3 {
+  fill: #ffc800;
+}
+.the-graph-light .fill.route4 {
+  fill: #00cc3d;
+}
+.the-graph-light .fill.route5 {
+  fill: #abf2da;
+}
+.the-graph-light .fill.route6 {
+  fill: #00c9cc;
+}
+.the-graph-light .fill.route7 {
+  fill: #0052cc;
+}
+.the-graph-light .fill.route8 {
+  fill: #40c;
+}
+.the-graph-light .fill.route9 {
+  fill: #ffa8ba;
+}
+.the-graph-light .fill.route10 {
+  fill: #cc006d;
+}
+@-moz-keyframes heartbeats {
+  0% {
+    stroke-width: 16px;
+  }
+
+  10% {
+    stroke-width: 24px;
+  }
+
+  30% {
+    stroke-width: 16px;
+  }
+
+  40% {
+    stroke-width: 24px;
+  }
+
+  60% {
+    stroke-width: 16px;
+  }
+}
+@-webkit-keyframes heartbeats {
+  0% {
+    stroke-width: 16px;
+  }
+
+  10% {
+    stroke-width: 24px;
+  }
+
+  30% {
+    stroke-width: 16px;
+  }
+
+  40% {
+    stroke-width: 24px;
+  }
+
+  60% {
+    stroke-width: 16px;
+  }
+}
+@-o-keyframes heartbeats {
+  0% {
+    stroke-width: 16px;
+  }
+
+  10% {
+    stroke-width: 24px;
+  }
+
+  30% {
+    stroke-width: 16px;
+  }
+
+  40% {
+    stroke-width: 24px;
+  }
+
+  60% {
+    stroke-width: 16px;
+  }
+}
+@-ms-keyframes heartbeats {
+  0% {
+    stroke-width: 16px;
+  }
+
+  10% {
+    stroke-width: 24px;
+  }
+
+  30% {
+    stroke-width: 16px;
+  }
+
+  40% {
+    stroke-width: 24px;
+  }
+
+  60% {
+    stroke-width: 16px;
+  }
+}
+@keyframes heartbeats {
+  0% {
+    stroke-width: 16px;
+  }
+
+  10% {
+    stroke-width: 24px;
+  }
+
+  30% {
+    stroke-width: 16px;
+  }
+
+  40% {
+    stroke-width: 24px;
+  }
+
+  60% {
+    stroke-width: 16px;
+  }
+}
+</style>
+    <div id="svgcontainer"></div>
+  </template>
+
+  <script type="text/javascript" src="bower_components/the-graph/the-graph/the-graph.js"></script>
+  <script type="text/javascript" src="bower_components/the-graph/the-graph/font-awesome-unicode-map.js"></script>
+  <script type="text/javascript" src="bower_components/the-graph/the-graph/the-graph-app.js"></script>
+  <script type="text/javascript" src="bower_components/the-graph/the-graph/the-graph-graph.js"></script>
+  <script type="text/javascript" src="bower_components/the-graph/the-graph/the-graph-node.js"></script>
+  <script type="text/javascript" src="bower_components/the-graph/the-graph/the-graph-node-menu.js"></script>
+  <script type="text/javascript" src="bower_components/the-graph/the-graph/the-graph-node-menu-port.js"></script>
+  <script type="text/javascript" src="bower_components/the-graph/the-graph/the-graph-node-menu-ports.js"></script>
+  <script type="text/javascript" src="bower_components/the-graph/the-graph/the-graph-port.js"></script>
+  <script type="text/javascript" src="bower_components/the-graph/the-graph/the-graph-edge.js"></script>
+  <script type="text/javascript" src="bower_components/the-graph/the-graph/the-graph-iip.js"></script>
+  <script type="text/javascript" src="bower_components/the-graph/the-graph/the-graph-group.js"></script>
+  <script type="text/javascript" src="bower_components/the-graph/the-graph/the-graph-tooltip.js"></script>
+  <script type="text/javascript" src="bower_components/the-graph/the-graph/the-graph-menu.js"></script>
+
+  
+</polymer-element>
+
+
+<polymer-element name="the-graph-editor" attributes="grid snap width height autolayout theme selectedNodes selectedEdges animatedEdges onContextMenu" touch-action="none" assetpath="bower_components/the-graph/the-graph-editor/">
+  <template>
+    <the-graph id="graph" name="{{ graph.properties.name }}" graph="{{nofloGraph}}" menus="{{menus}}" width="{{width}}" height="{{height}}" pan="{{pan}}" scale="{{scale}}" autolayout="{{autolayout}}" theme="{{theme}}" selectednodes="{{selectedNodes}}" selectededges="{{selectedEdges}}" animatededges="{{animatedEdges}}" getmenudef="{{getMenuDef}}">
+    </the-graph>
+  </template>
+  
+</polymer-element>
+
+    <noflo-polymer name="the-graph-editor" inports="graph library theme width height" outports="edges nodes"></noflo-polymer>
+    <polymer-element name="noflo-polymer" attributes="element inports outports" assetpath="browser/noflo-noflo-polymer/noflo-polymer/">
+  
+</polymer-element>
+
+    <polymer-element name="number-scrubber" attributes="value min max mod step distance" touch-action="none" on-trackstart="{{onTrackStart}}" on-track="{{onTrack}}" on-trackend="{{onTrackEnd}}" assetpath="elements/">
+  <template>
+    <style>
+      :host {
+        -webkit-user-select: none;      /* disable cut copy paste */
+        -webkit-touch-callout: none;    /* disable callout, image save panel */
+        user-select: none;
+        touch-callout: none;
+
+        cursor: ew-resize;
+
+        display: inline-block;
+        text-align: center;      
+      }
+    </style>
+  </template>
+  
+</polymer-element>
+
+<polymer-element name="noflo-node-inspector" attributes="node component graph" class="the-card-content" assetpath="elements/">
+  <template>
+    <style>
+      .ports {
+        margin-bottom: 8px;
+      }
+      ul.ports li {
+        display: block;
+        position: relative;
+        clear: left;
+      }
+      ul.ports li label span {
+        float: left;
+        clear: left;
+        font-size: 12px;
+        padding-top: 0;
+        width: 87px;
+        line-height: 36px;
+        overflow: hidden;
+      }
+
+      ul.ports li p {
+        margin: 0px;
+        padding: 0px;
+        font-size: 10px;
+        margin-left: 87px;
+        margin-bottom: 3px;
+        line-height: 13px;
+        max-height: 26px;
+        overflow: hidden;
+        color: hsl(189, 50%, 80%);
+      }
+
+      /* Hide spinners */
+      input[type=number]::-webkit-inner-spin-button, 
+      input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none; 
+        margin: 0; 
+      }
+      input[type=number] {
+        -moz-appearance:textfield;
+      }
+
+      ul.ports li button {
+        padding: 8px;
+        height: 19px;
+        width: 19px;
+      }
+      ul.ports li label button {
+        background-color: hsl(184, 50%, 11%);
+        color: hsl(184, 40%, 89%);
+        display: block;
+        padding: 8px;
+        height: 36px;
+        width: 36px;
+      }
+      ul.ports li label button:active {
+        color: white;
+      }
+      ul.ports li label i {
+        margin:0;
+      }
+      ul.ports li span.route {
+        /* TODO: route colors */
+        background-color: white;
+        float: none;
+        display: inline-block;
+        width: 125px;
+        height: 1px;
+        padding: 0;
+      }
+      ul.ports .remove-value {
+        background-color: transparent !important;
+        opacity: .3;
+        border: none !important;
+        position: absolute;
+        top: 0px;
+        right: 0px;
+        line-height: 36px;
+        height: 36px;
+        width: 36px;
+        text-align: center;
+        padding: 0px;
+        font-size: 12px;
+      }
+      ul.ports li span.route0  { background-color: hsl(  0,100%,100%); }
+      ul.ports li span.route1  { background-color: hsl(  0, 98%, 46%); }
+      ul.ports li span.route2  { background-color: hsl( 35, 98%, 46%); }
+      ul.ports li span.route3  { background-color: hsl( 60, 98%, 46%); }
+      ul.ports li span.route4  { background-color: hsl(135, 98%, 46%); }
+      ul.ports li span.route5  { background-color: hsl(160, 98%, 46%); }
+      ul.ports li span.route6  { background-color: hsl(185, 98%, 46%); }
+      ul.ports li span.route7  { background-color: hsl(210, 98%, 46%); }
+      ul.ports li span.route8  { background-color: hsl(285, 98%, 46%); }
+      ul.ports li span.route9  { background-color: hsl(310, 98%, 46%); }
+      ul.ports li span.route10 { background-color: hsl(335, 98%, 46%); }
+      
+      
+      ul.ports li input {
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+        width: 178px;
+        height: 36px;
+        border: none;
+        font-family: "SourceCodePro",Helvetica,Arial,sans-serif;
+        font-size: 10px;
+        padding: 9px 26px 9px 36px;
+        margin: 0px;
+      }
+      ul.ports li input[type="checkbox"] {
+        height: 18px;
+        margin-top: 9px;
+        margin-left: 36px;
+        width: 18px;
+      }
+      ul.ports li input[type="checkbox"]:before {
+        display: block;
+        content: '';
+        width: 177px;
+        height: 36px;
+        margin-top: -9px;
+        margin-left: -36px;
+        background-color: hsla( 0, 0%, 20%, .2);
+        color: hsl( 0, 0%, 75%);
+        border-left: 1px solid hsla( 0, 0%, 75%, 0.1);
+      }
+
+      ul.ports li select {
+        height: 18px;
+        margin-top: 9px;
+        margin-left: 36px;
+        max-width: 110px;
+      }
+
+      ul.ports li  input, 
+      ul.ports li  button  { 
+        background-color: hsla(  0,  0%, 30%, 0.35); 
+        color:             hsl(  0,  0%, 90%);
+      }
+      
+      ul.ports li:nth-child(even) input, 
+      ul.ports li:nth-child(even) button {
+        background-color: hsla(210, 100%, 20%, .1);
+      }
+      ul.ports li:nth-child(odd) input, 
+      ul.ports li:nth-child(odd) button {
+        background-color: hsla(190, 100%, 20%, .1);
+      }
+
+      ul.ports li.route0  input, 
+      ul.ports li.route0  button  { 
+        background-color: hsla(  0,  0%, 30%, 0.35); 
+      }
+      ul.ports li.route1  input, 
+      ul.ports li.route1  button  { 
+        background-color: hsla(  0, 98%, 20%, 0.35); 
+      }
+      ul.ports li.route2  input, 
+      ul.ports li.route2  button  { 
+        background-color: hsla( 35, 98%, 20%, 0.35); 
+      }
+      ul.ports li.route3  input, 
+      ul.ports li.route3  button  { 
+        background-color: hsla( 60, 98%, 20%, 0.35); 
+      }
+      ul.ports li.route4  input, 
+      ul.ports li.route4  button  { 
+        background-color: hsla(135, 98%, 20%, 0.35); 
+      }
+      ul.ports li.route5  input, 
+      ul.ports li.route5  button  { 
+        background-color: hsla(160, 98%, 20%, 0.35); 
+      }
+      ul.ports li.route6  input, 
+      ul.ports li.route6  button  { 
+        background-color: hsla(185, 98%, 20%, 0.35); 
+      }
+      ul.ports li.route7  input, 
+      ul.ports li.route7  button  { 
+        background-color: hsla(210, 98%, 20%, 0.35); 
+      }
+      ul.ports li.route8  input, 
+      ul.ports li.route8  button  { 
+        background-color: hsla(285, 98%, 20%, 0.35); 
+      }
+      ul.ports li.route9  input, 
+      ul.ports li.route9  button  { 
+        background-color: hsla(310, 98%, 20%, 0.35); 
+      }
+      ul.ports li.route10 input, 
+      ul.ports li.route10 button  { 
+        background-color: hsla(335, 98%, 20%, 0.35); 
+      }
+
+
+      ul.ports li.error input {
+        background-color: rgb(121, 18, 18);
+        border: 1px solid red;
+      }
+      
+      
+      ul.ports li         label > span { color: hsl(  0,  0%, 75%);}  
+      ul.ports li.route0  label > span { color: hsl(  0,  0%,100%);}  
+      ul.ports li.route1  label > span { color: hsl(  0, 98%, 46%);}
+      ul.ports li.route2  label > span { color: hsl( 35, 98%, 46%);}
+      ul.ports li.route3  label > span { color: hsl( 60, 98%, 46%);}
+      ul.ports li.route4  label > span { color: hsl(135, 98%, 46%);}
+      ul.ports li.route5  label > span { color: hsl(160, 98%, 46%);}
+      ul.ports li.route6  label > span { color: hsl(185, 98%, 46%);}
+      ul.ports li.route7  label > span { color: hsl(210, 98%, 46%);}
+      ul.ports li.route8  label > span { color: hsl(285, 98%, 46%);}
+      ul.ports li.route9  label > span { color: hsl(310, 98%, 46%);}
+      ul.ports li.route10 label > span { color: hsl(335, 98%, 46%);}
+      
+      
+
+      ul.ports  li        input, 
+      ul.ports  li        button {
+        border-left: 1px solid hsla(  0,  0%, 75%, 0.5); 
+      }
+      ul.ports  li.route0 input, 
+      ul.ports  li.route0 button {
+        border-left: 1px solid hsla(  0,  0%,100%, 0.5); 
+      }
+      ul.ports  li.route1 input, 
+      ul.ports  li.route1 button {
+        border-left: 1px solid hsla(  0, 98%, 46%, 0.5);
+      }
+      ul.ports  li.route2 input, 
+      ul.ports  li.route2 button {
+        border-left: 1px solid hsla( 35, 98%, 46%, 0.5);
+      }
+      ul.ports  li.route3 input, 
+      ul.ports  li.route3 button {
+        border-left: 1px solid hsla( 60, 98%, 46%, 0.5);
+      }
+      ul.ports  li.route4 input, 
+      ul.ports  li.route4 button {
+        border-left: 1px solid hsla(135, 98%, 46%, 0.5);
+      }
+      ul.ports  li.route5 input, 
+      ul.ports  li.route5 button {
+        border-left: 1px solid hsla(160, 98%, 46%, 0.5);
+      }
+      ul.ports  li.route6 input, 
+      ul.ports  li.route6 button {
+        border-left: 1px solid hsla(185, 98%, 46%, 0.5);
+      }
+      ul.ports  li.route7 input, 
+      ul.ports  li.route7 button {
+        border-left: 1px solid hsla(210, 98%, 46%, 0.5);
+      }
+      ul.ports  li.route8 input, 
+      ul.ports  li.route8 button {
+        border-left: 1px solid hsla(285, 98%, 46%, 0.5);
+      }
+      ul.ports  li.route9 input, 
+      ul.ports  li.route9 button {
+        border-left: 1px solid hsla(310, 98%, 46%, 0.5);
+      }
+      ul.ports li.route10 input, 
+      ul.ports li.route10 button {
+        border-left: 1px solid hsla(335, 98%, 46%, 0.5);
+      }
+      
+      number-scrubber,
+      ul.ports li label span:before {
+        display: inline;
+        line-height: 36px;
+        font-size: 10px;
+        float: right;
+        position: absolute;
+        left: 86px;
+        text-transform: uppercase;
+        opacity: 0.5;
+        width: 36px;
+        text-align: center;      
+      }
+
+      number-scrubber {
+        z-index: 5;
+        height: 36px;
+      }
+      
+      ul.ports li.port-type-color label span:before,
+      ul.ports li.port-type-int label span:before,
+      ul.ports li.port-type-number label span:before {
+        content: '#';
+      }
+      ul.ports li.port-type-array label span:before {
+        content: '[]';
+      }
+      ul.ports li.port-type-object label span:before {
+        content: '{}';
+      }
+      ul.ports li.port-type-string label span:before {
+        content: '"';
+      }
+      ul.ports li.port-type-all label span:before {
+        content: '*';
+      }
+
+    </style>
+    <header>
+      <h1 on-keydown="{{ checkUpdateLabel }}" on-blur="{{ updateLabel }}" contenteditable="">{{ label }}</h1>
+      <template if="{{ node.label != node.component }}">
+        <h2>{{ node.component }}</h2>
+      </template>
+    </header>
+    <ul class="ports">
+      <template repeat="{{ port in inports }}">
+        <li class="route route{{ port.route }} {{ port.class }} port-type-{{ port.type }}">
+          <label><span title="{{ port.name }}">{{ port.label }}</span>
+
+            <template if="{{ port.type == &apos;bang&apos; }}">
+              <button name="{{ port.name }}" on-click="{{ sendBang }}"><i class="fa fa-bolt"></i></button>
+            </template>
+            <template if="{{ port.type == &apos;boolean&apos; }}">
+              <input type="checkbox" name="{{ port.name }}" checked="{{ port.value }}" data-type="{{ port.type }}" on-change="{{ updateValue }}">
+            </template>
+            <template if="{{ port.values }}">
+              <select name="{{ port.name }}" data-type="{{ port.type }}" on-change="{{ updateValue }}" value="{{ port.value }}">
+                <option></option>
+                <template repeat="{{ value in port.values }}">
+                  <option value="[[value]]" selected?="{{ port.value == value }}">[[value]]</option>
+                </template>
+              </select>
+            </template>
+            <template if="{{ port.type == &apos;int&apos; &amp;&amp; !port.values }}">
+              <number-scrubber name="{{ port.name }}" value="{{port.value}}" step="1" data-type="int" on-scrubstart="{{ scrubStart }}" on-scrub="{{updateValue}}" on-scrubend="{{ scrubEnd }}">#</number-scrubber>
+              <input type="text" data-type="int" name="{{ port.name }}" value="{{ port.value }}" on-change="{{ updateValue }}" on-keydown="{{ checkEnter }}">
+            </template>
+            <template if="{{ port.type == &apos;number&apos; &amp;&amp; !port.values }}">
+              <number-scrubber name="{{ port.name }}" value="{{ port.value }}" step="0.01" data-type="number" on-scrubstart="{{ scrubStart }}" on-scrub="{{updateValue}}" on-scrubend="{{ scrubEnd }}">#</number-scrubber>
+              <input type="text" data-type="number" name="{{ port.name }}" value="{{ port.value }}" on-change="{{ updateValue }}" on-keydown="{{ checkEnter }}">
+            </template>
+            <template if="{{ port.type != &apos;bang&apos; &amp;&amp; port.type != &apos;boolean&apos; &amp;&amp; port.type != &apos;int&apos; &amp;&amp; port.type != &apos;number&apos; &amp;&amp; !port.values }}">
+              <input type="{{ port.inputType }}" name="{{ port.name }}" value="{{ port.value }}" autocapitalize="off" autocorrect="off" data-type="{{ port.type }}" on-keydown="{{ checkEnter }}" on-change="{{ updateValue }}">
+            </template>
+            <template if="{{ port.type != &apos;bang&apos; &amp;&amp; port.value != undefined }}">
+              <button class="remove-value" data-port="{{ port.name }}" on-click="{{ removeValue }}"><i class="fa fa-ban"></i></button>
+            </template>
+
+          </label>
+          <template if="{{ port.description }}">
+          <p>{{ port.description }}</p>
+          </template>
+        </li>
+      </template>
+    </ul>
+  </template>
+  
+</polymer-element>
+
+<polymer-element name="noflo-exported-inspector" attributes="graph publicport privateport direction" class="modal-content" assetpath="elements/">
+  <template>
+    <h1>Published {{ direction }} port {{ publicport }}</h1>
+    <form>
+      <label>
+        Port name
+        <input type="text" value="{{ name }}" required>
+      </label>
+      <div class="toolbar">
+        <button on-click="{{ send }}" class="{{ { disabled: !canSend } | tokenList }}">Rename</button>
+        <a on-click="{{ close }}">Cancel</a>
+      </div>
+    </form>
+  </template>
+  
+</polymer-element>
+
+<polymer-element name="noflo-type-selector" attributes="runtimes type" assetpath="elements/">
+  <template>
+    <style>
+      :host {
+        top: calc(50% - 220px) !important;
+      }
+      ul.types {
+        padding: 0px;
+        margin: 0px;
+        margin-left: -9px;
+        margin-right: -9px;
+        list-style: none;
+      }
+      ul.types li {
+        width: 274px;
+        height: 105px;
+        overflow: hidden;
+        display: inline-block;
+        text-align: center;
+        background-color: hsl(192, 25%, 75%);
+        color: hsl(189, 50%, 80%);
+        border-radius: 3px;
+        margin-right: 9px;
+        margin-left: 9px;
+        margin-bottom: 18px;
+        position: relative;
+        cursor: pointer;
+        transition: background-color 0.3s ease-in-out;
+      }
+      ul.types li.selected,
+      ul.types li:hover {
+        background-color: hsl(190, 100%, 30%);
+        color: white;
+        cursor: default;
+      }
+      ul.types li.selected p {
+        color: hsl(0, 0%, 80%);
+      }
+      ul.types li h2 {
+        position: absolute;
+        top: 36px;
+        line-height: 36px;
+        width: 180px;
+        text-transform: none;
+        font-size: 10px;
+        text-align: left;
+        white-space: nowrap;
+        left: 18px;
+        padding: 0px;
+        margin: 0px;
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
+      ul.types li p {
+        position: absolute;
+        top: 53px;
+        left: 18px;
+        width: 180px;
+        text-transform: uppercase;
+        font-size: 8px;
+        text-align: left;
+        max-height: 36px;
+        overflow: hidden;
+        color: hsl(189, 50%, 80%);
+      }
+      ul.types li i {
+        font-size: 72px;
+        position: absolute;
+        right: -8px;
+        top: 9px;
+      }
+    </style>
+    <ul class="types">
+      <template repeat="{{ availtype in available }}">
+      <li on-click="{{ selectType }}" data-id="{{ availtype.id }}" class="{{ { selected: type == availtype.id } | tokenList }}">
+        <h2>{{ availtype.label }}</h2>
+        <i class="fa fa-{{ availtype.icon }}"></i>
+        <template if="{{ availtype.runtimes.length === 1 }}">
+        <p>{{ availtype.runtimes.length }} runtime</p>
+        </template>
+        <template if="{{ availtype.runtimes.length &gt; 1 }}">
+        <p>{{ availtype.runtimes.length }} runtimes</p>
+        </template>
+      </li>
+      </template>
+    </ul>
+    </template>
+  
+  
+</polymer-element>
+
+<polymer-element name="noflo-new-graph" attributes="project runtimes" class="modal-content" assetpath="elements/">
+  <template>
+    <h1>Create new graph</h1>
+    <form>
+      <label>
+        Graph name
+        <input type="text" value="{{ name }}" placeholder="MyCoolGraph" required>
+      </label>
+      <label>
+        Type
+        <noflo-type-selector type="{{ type }}" runtimes="{{ runtimes }}"></noflo-type-selector>
+      </label>
+      <div class="toolbar">
+        <button on-click="{{ send }}" class="{{ { disabled: !canSend } | tokenList }}">Create</button>
+        <a on-click="{{ close }}">Cancel</a>
+      </div>
+    </form>
+  </template>
+  
+</polymer-element>
+
+<polymer-element name="noflo-group-inspector" attributes="graph group groupdescription nodes" class="modal-content" assetpath="elements/">
+  <template>
+    <h1>
+      <template if="{{ group }}">
+      {{ group }}
+      </template>
+      <template if="{{ !group }}">
+      New
+      </template>
+      group containing {{ nodes.length }} nodes
+    </h1>
+    <form>
+      <label>
+        Group name
+        <input type="text" value="{{ name }}" placeholder="processing" required>
+      </label>
+      <label>
+        Group description
+        <input type="text" value="{{ description }}" placeholder="The nodes that process things" required>
+      </label>
+      <div class="toolbar">
+        <button on-click="{{ send }}">
+          <template if="{{ group }}">
+          Rename
+          </template>
+          <template if="{{ !group }}">
+          Create
+          </template>
+        </button>
+        <a on-click="{{ close }}">Cancel</a>
+      </div>
+    </form>
+  </template>
+  
+</polymer-element>
+
+<polymer-element name="the-card-stack" attributes="type" assetpath="bower_components/the-card/the-card-stack/">
+  
+</polymer-element>
+
+<polymer-element name="the-card" attributes="type" assetpath="bower_components/the-card/the-card/">
+  <template>
+    <content select="h1"></content>
+    <content></content>
+  </template>
+  <style>
+    the-card {
+      display: block;
+    }
+    h1 {
+      margin: 0px;
+    }
+  </style>
+  
+</polymer-element>
+
+<polymer-element name="the-panel" attributes="edge size handle open automatic" assetpath="bower_components/the-panel/the-panel/">
+  <template>
+    <style>
+      @host {
+        :scope {
+          position: fixed;
+          overflow: hidden;
+        }
+      }
+    </style>
+    <content select="header"></content>
+    <content select="main"></content>
+    <content select="footer"></content>
+  </template>
+  
+</polymer-element>
+
+<polymer-element name="noflo-context" attributes="project graphs component node edge search" assetpath="elements/">
+  <template>
+    <style>
+      #context {
+        position: fixed;
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0);
+        left: 36px;
+        top: 72px;
+        width: calc(72px * 4 + 3px);
+        max-height: calc(100% - 72px);
+        box-sizing: border-box;
+        display: block;
+        overflow-y: auto;
+        overflow-x: visible;
+      }
+    </style>
+    <section id="context"></section>
+    <the-panel id="fixed" edge="right" size="324" handle="36" automatic="false">
+      <header></header>
+      <main></main>
+      <footer></footer>
+    </the-panel>
+  </template>
+  
+</polymer-element>
+
+    <noflo-polymer name="noflo-context" inports="runtimes project graphs component editor search clear getpanel nodes edges runtime" outports="project graphs currentgraph component example newgraph nodes edges result toolpanel contextpanel"></noflo-polymer>
+    <!-- 
+  
+* Renders a noflo graph instance into a canvas
+* Autoscales the render to fit, and exposes the scale as thumbscale, thumbrectangle, viewrectangle
+
+-->
+
+<polymer-element name="the-graph-thumb" attributes="graph width height thumbscale thumbrectangle theme" assetpath="bower_components/the-graph/the-graph-thumb/">
+  <template>
+    <canvas id="canvas" width="{{width}}" height="{{height}}" style="position:absolute;top:0;left:0;"></canvas>
+  </template>
+  
+</polymer-element>
+
+<polymer-element name="noflo-account-settings" attributes="user gridtoken githubtoken theme" class="modal-content" assetpath="elements/">
+  <template>
+    <h1>Account settings for {{ user.name }}</h1>
+    <form>
+      <label>
+        User Identifier
+        <input type="text" readonly value="{{ user.uuid }}">
+      </label>
+      <label>
+        GitHub API token
+        <input type="text" value="{{ githubtoken }}" placeholder="Token for GitHub API access" autocapitalize="off" autocorrect="off" readonly>
+      </label>
+      <label>
+        Theme
+        <select name="type" value="{{ theme }}">
+          <option value="dark">Lazer</option>
+          <option value="light">Tube</option>
+        </select>
+      </label>
+      <div class="toolbar">
+        <button on-click="{{ send }}">Save</button>
+        <a on-click="{{ close }}">Cancel</a>
+      </div>
+    </form>
+  </template>
+  
+</polymer-element>
+
+<polymer-element name="noflo-account" attributes="clientid site gatekeeper" assetpath="elements/">
+  <template>
+    <style>
+
+      :host {
+        text-align: center;
+        display: block;
+        background-color: hsla(0, 0%, 0%, 0.98) !important;
+        padding-top: 36px;
+        padding-bottom: 72px;
+        /*
+        background-image: 
+          radial-gradient(2px at 0px 0px, hsla(0, 100%, 100%, 0.2) 1px, hsla(0, 0%, 0%, 0) 1.1px), 
+          radial-gradient(2px at 0px 0px, hsla(210, 51%, 21%, 0.5) 1px, hsla(0, 0%, 0%, 0) 1.1px);
+        background-size: 72px 72px, 18px 18px;
+        background-position: 50% 0px, calc(50% - 9px) 0px;
+        */
+      }
+      .avatar {
+        border-radius: 50px;
+        background-color: black;
+        border: 2px solid hsl(190, 100%, 30%);
+        display: block;
+        position: relative;
+        width: 72px;
+        height: 72px;
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 36px;
+        margin-bottom: 36px;
+        overflow: hidden;
+        box-sizing: border-box;
+      }
+      .avatar:before {
+        content: '';
+        border: 3px solid black;
+        border-radius: 50px;
+        width: 70px;
+        height: 70px;
+        left: -1px;
+        top: -1px;
+        position: absolute;
+        z-index: 1;
+        box-sizing: border-box;
+      }
+      .avatar.flowhub {
+        border-radius: 11px;
+        border: 1px solid hsl(190, 100%, 30%);
+      }
+      .avatar.noflo {
+        border: 1px solid hsl(190, 100%, 30%);
+      }
+      .avatar.flowhub:before {
+        border: none;
+        border-radius: 6px;
+        width: 72px;
+        height: 72px;
+      }
+      .avatar.noflo:before {
+        border: none;
+      }
+      .avatar img {
+        border: 2px solid hsl(190, 90%, 45%);
+        width: 66px;
+        height: 66px;
+        margin-top: 1px;
+        margin-left: 1px;
+        box-sizing: border-box;
+        border-radius: 50px;
+      }
+      .flowhub img {
+        width: 54px;
+        height: 53px;
+        padding: 6px;
+        margin-top: 8px;
+        border-radius: 6px;
+        box-sizing: border-box;
+      }
+      .noflo img {
+        width: 55px;
+        height: 22px;
+        border: none;
+        margin-top: 23px;
+        margin-left: 5px;
+        border-radius: initial;
+      }
+      h1 {
+        line-height: 18px;
+        margin: 0px;
+        padding: 0px;
+        position: relative;
+      }
+      #plan {
+        position: absolute;
+        font-size: 8px;
+        text-transform: uppercase;
+        top: -8px;
+        margin-left: 8px;
+        color: black;
+        background-color: hsl(190, 90%, 45%);
+        line-height: 10px;
+        text-decoration: none;
+        padding: 2px;
+        border-radius: 2px;
+      }
+      #plan.free,
+      #plan.beta,
+      #plan.backer {
+        background-color: hsl(135,90%,45%);
+      }
+      .toolbar {
+        margin-top: 54px;
+        padding: 1px;
+        border-radius: 3px;
+        border: 1px solid hsl(190, 90%, 45%);
+        color: hsl(190, 90%, 45%);
+        background-color: black;
+        display: inline-block;
+        box-sizing: border-box;
+        margin-bottom: -3px;
+      }
+      .toolbar button,
+      .toolbar a.login {
+        background-color: hsl(190, 90%, 45%);
+        color: hsla(0, 0%, 0%, 0.98);
+        border: none;
+        font-size: 13px;
+        border-radius: 3px;
+        font-family: "SourceCodePro",Helvetica,Arial,sans-serif;
+        height: 36px;
+        padding-left: 36px;
+        padding-right: 36px;
+        margin: 0px;
+      }
+      .toolbar a {
+        font-size: 13px;
+        color: hsl(190, 90%, 45%);
+        text-decoration: none;
+        height: 36px;
+        display: inline-block;
+        line-height: 36px;
+        padding-left: 36px;
+        padding-right: 36px;
+        cursor: pointer;
+      }
+
+    </style>
+    <template if="{{ user }}">
+      <template if="{{ avatar }}">
+      <div class="avatar"><img src="{{ avatar }}"></div>
+      </template>
+      <template if="{{ !avatar }}">
+      <div class="avatar noflo"><img src="app/noflo-logo-74.png"></div>
+      </template>
+      <h1>{{ user.name }} <a href="http://flowhub.io/preorder/" target="_blank" id="plan" class="{{ plan }}">{{ plan }}</a></h1>
+      <div class="toolbar">
+        <a on-click="{{ openSettings }}">Settings</a>
+        <button on-click="{{ logout }}">Logout</button>
+      </div>
+    </template>
+    <template if="{{ !user }}">
+      <div class="avatar noflo"><img src="app/noflo-logo-74.png"></div>
+      <h1>NoFlo Development Environment</h1>
+      <div class="toolbar">
+        <a id="loginbutton" class="login" on-click="{{ login }}">Login</a>
+      </div>
+    </template>
+  </template>
+  
+  </polymer-element>
+
+
+<polymer-element name="noflo-new-project" attributes="runtimes" class="modal-content" assetpath="elements/">
+  <template>
+    <style>
+      :host {
+        top: calc(50% - 233px) !important;
+      }
+    </style>
+    <h1>Create new project</h1>
+    <form>
+      <label>
+        Project name
+        <input type="text" value="{{ projectId }}" placeholder="my-project" autocapitalize="off" autocorrect="off" required>
+      </label>
+      <label>
+        Project label
+        <input type="text" value="{{ name }}" placeholder="My Cool Project" required>
+      </label>
+      <label>
+        Primary Type
+        <noflo-type-selector type="{{ type }}" runtimes="{{ runtimes }}"></noflo-type-selector>
+      </label>
+      <div class="toolbar">
+        <button on-click="{{ send }}" class="{{ { disabled: !canSend } | tokenList }}">Create</button>
+        <a on-click="{{ close }}">Cancel</a>
+      </div>
+    </form>
+  </template>
+  
+</polymer-element>
+
+<polymer-element name="noflo-new-runtime" class="modal-content" assetpath="elements/">
+  <template>
+    <style>
+      a {
+        color: hsl(190, 100%, 30%);
+      }
+      p {
+        font-size: 11px;
+      }
+    </style>
+    <h1>Register new runtime</h1>
+    <p>
+    <a href="http://flowhub.io" target="_blank">Flowhub</a> keeps a registry of runtimes available to each user.
+    To add new runtimes, use the <a href="https://github.com/the-grid/flowhub-registry#readme" target="_blank">Flowhub Registry API</a> and the refresh the runtime list.
+    </p>
+    <p>
+    For <a href="http://noflojs.org" target="_blank">NoFlo</a> runtimes running on Node.js, see <a href="https://github.com/noflo/noflo-nodejs#readme" target="_blank">noflo-nodejs</a>.
+    </p>
+    <label>
+      User Identifier
+      <input type="text" readonly value="{{ user.uuid }}">
+    </label>
+    <div class="toolbar">
+      <button on-click="{{ close }}">Close</button>
+    </div>
+  </template>
+  
+</polymer-element>
+
+<polymer-element name="noflo-main" attributes="open localProjects graphs components userRuntimes" assetpath="elements/">
+  <template>
+    <style>
+      :host {
+        background-color: hsl(190, 90%, 45%);
+        display: block;
+        z-index: 4;
+        position: fixed;
+        top: 0px;
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0);
+        overflow-y: auto;
+        height: 100%;
+        width: 100%;
+        transition: height 1s ease-in-out;
+      }
+      section {
+        /*
+        background-image: radial-gradient(1px at 0px 0px, hsl(210, 78%, 10%) 0.5px, hsla(0, 0%, 0%, 0) 1px);
+        background-position: 50% 0px;
+        background-size: 36px 36px;
+        */
+        display: block;
+        position: relative;
+        width: 70%;
+        padding-left: 15%;
+        padding-right: 15%;
+      }
+      section > h2 {
+        font-size: 17px;
+        line-height: 36px;
+        margin-top: 36px;
+        height: 36px;
+        color: white;
+        text-shadow: 0 1px 0 hsl(190, 100%, 40%);
+        text-transform: none;
+      }
+      section > h2 small {
+        font-size: 10px;
+        text-transform: uppercase;
+        color: hsl(189, 50%, 25%);
+      }
+      ul.tabs {
+        position: absolute;
+        display: inline-block;
+        top: 0px;
+        left: calc(50% - 133px);
+        margin: 0px;
+        padding: 0px;
+        list-style: none;
+        padding: 1px;
+      }
+      ul.tabs li {
+        display: inline;
+        line-height: 36px;
+        font-size: 13px;
+        color: hsl(189, 50%, 25%);
+        text-decoration: none;
+        padding-left: 36px;
+        padding-right: 36px;
+        cursor: pointer;
+      }
+      ul.tabs li.selected {
+        border: none;
+        border-radius: 3px;
+        background-color: rgba(0, 42, 51, 0.498039);
+        color: white;
+        border-radius: 3px;
+        padding-top: 8px;
+        padding-bottom: 9px;
+        cursor: default;
+      }
+      ul.projects {
+        padding: 0px;
+        margin-top: 36px;
+        margin-bottom: 36px;
+        margin-left: -18px;
+        margin-right: -18px;
+        list-style: none;
+      }
+      ul.projects li {
+        width: 216px;
+        height: 105px;
+        overflow: hidden;
+        display: inline-block;
+        text-align: center;
+        background-color: hsla(0, 0%, 0%, .98);
+        border-radius: 3px;
+        margin-right: 18px;
+        margin-left: 18px;
+        margin-bottom: 36px;
+        position: relative;
+        cursor: pointer;
+      }
+      ul.projects li.add {
+        background-color: hsl(192, 25%, 92%);
+        color: black;
+        cursor: default;
+      }
+      ul.projects li.remote {
+        cursor: default;
+      }
+      ul.projects li.runtime {
+        cursor: default;
+      }
+      ul.projects li the-graph-thumb {
+        display: block;
+        position: absolute;
+        left: 100px;
+        top: -20px;
+      }
+      section button {
+        background-color: transparent;
+        color: hsl(189, 50%, 25%);
+        font-size: 13px;
+        border-radius: 3px;
+        font-family: "SourceCodePro",Helvetica,Arial,sans-serif;
+        height: 36px;
+        border: none;
+        padding-left: 13px;
+        padding-right: 13px;
+      }
+      ul.projects li button {
+        display: block;
+        border: 1px solid hsl(189, 50%, 25%);
+        position: absolute;
+        right: 18px;
+        top: 36px;
+      }
+      ul.projects li h2 {
+        position: absolute;
+        top: 36px;
+        line-height: 36px;
+        width: 126px;
+        text-transform: none;
+        font-size: 12px;
+        text-align: left;
+        white-space: nowrap;
+        left: 18px;
+        padding: 0px;
+        margin: 0px;
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
+      ul.projects li p {
+        position: absolute;
+        top: 53px;
+        left: 18px;
+        width: 75px;
+        text-transform: uppercase;
+        font-size: 10px;
+        text-align: left;
+        max-height: 36px;
+        overflow: hidden;
+        color: hsl(189, 11%, 50%);
+      }
+      ul.projects li a {
+        color: black;
+        text-decoration: none;
+      }
+
+    </style>
+    <noflo-account id="mainaccount" clientid="9d963a3d-8b6f-42fe-bb36-6fccecd039af"></noflo-account>
+    <div id="loginrequired">
+      <section id="projects">
+        <h2>Projects
+            <template if="{{ projectList === &apos;local&apos; }}">
+            <small>{{ localProjects.length }}</small>
+            </template>
+            <template if="{{ projectList === &apos;github&apos; }}">
+            <small>{{ remoteProjects.length }}</small>
+            </template>
+            <template if="{{ projectList === &apos;github&apos; }}">
+            <button on-click="{{ fetchGithub }}"><i id="fetchgithub" class="fa fa-refresh"></i></button>
+            </template>
+        </h2>
+        <ul class="tabs">
+          <template if="{{ projectList === &apos;local&apos; }}">
+            <li class="selected">On device</li>
+            <template if="{{ githubToken }}">
+            <li on-click="{{ openGithub }}">GitHub</li>
+            </template>
+          </template>
+          <template if="{{ projectList === &apos;github&apos; }}">
+          <li on-click="{{ openLocal }}">On device</li>
+            <li class="selected">GitHub</li>
+          </template>
+        </ul>
+        <ul class="projects">
+          <template if="{{ projectList === &apos;local&apos; }}">
+          <li class="add">
+            <h2>New project</h2>
+            <button id="newproject" on-click="{{ newProject }}">Create</button>
+          </li>
+          <template repeat="{{ project in localProjects }}">
+            <li on-click="{{ openProject }}" data-id="{{ project.id }}">
+              <the-graph-thumb graph="{{ project.mainGraph }}" width="200" height="120"></the-graph-thumb>
+              <h2>{{ project.name }}</h2>
+              <p>{{ project.graphs.length }}&nbsp;graphs, {{ project.components.length }}&nbsp;components</p>
+            </li>
+          </template>
+          </template>
+          <template if="{{ projectList === &apos;github&apos; }}">
+          <template repeat="{{ project in remoteProjects }}">
+            <li class="remote">
+              <h2>{{ project.name }}</h2>
+              <p>{{ project.description }}</p>
+              <button on-click="{{ downloadProject }}" data-name="{{ project.name }}" data-repo="{{ project.repo }}"><i class="fa fa-cloud-download"></i></button>
+            </li>
+          </template>
+          </template>
+        </ul>
+      </section>
+      <section id="runtimes">
+        <h2>
+          Runtimes <small>{{ userRuntimes.length }}</small>
+          <button on-click="{{ fetchFlowhub }}"><i id="fetchflowhub" class="fa fa-refresh"></i></button>
+        </h2>
+        <ul class="projects">
+          <li class="add">
+            <h2>New runtime</h2>
+            <button on-click="{{ newRuntime }}">Register</button>
+          </li>
+          <template repeat="{{ userRuntimes }}">
+          <li on-click="{{ openRuntime }}" data-id="{{ id }}" class="runtime {{ type }}">
+            <h2>{{ label }}</h2>
+            <p>{{ address }}</p>
+          </li>
+          </template>
+        </ul>
+      </section>
+    </div>
+    <section id="examples">
+      <h2>
+        Examples <small>{{ examples.length }}</small>
+      </h2>
+      <ul class="projects">
+        <template repeat="{{ examples }}">
+        <li on-click="{{ openExample }}" data-id="{{ id }}" class="example">
+          <h2>{{ label }}</h2>
+          <p>{{ address }}</p>
+        </li>
+        </template>
+      </ul>
+    </section>
+  </template>
+  
+</polymer-element>
+
+    <noflo-polymer name="noflo-main" inports="open projects graphs components localruntime runtimes route token preparedefaults createdproject" outports="newproject project graph component download githubtoken projects runtimes runtime theme"></noflo-polymer>
+    <polymer-element name="noflo-preview" attributes="runtime maximized" assetpath="elements/">
+  <template>
+    <style>
+      :host {
+        padding: 0px;
+        height: 350px;
+        max-height: none;
+        overflow: hidden;
+      }
+      :host(.the-card-content){
+        max-height: none !important;
+      }
+      header h1 {
+        left: 0px;
+      }
+      ul.toolbar2right {
+        right: 0px;
+      }
+      .blue-button {
+        background-color: transparent;
+      }
+      #preview {
+        text-align: center;
+      }
+      #preview pre {
+        max-height: 304px;
+        color: #7ee67e;
+        font-size: 10px;
+        overflow-x: hidden;
+        overflow-y: auto;
+        text-align: left;
+        margin-bottom: 0px;
+        -webkit-user-select: initial;
+        user-select: initial;
+      }
+      #preview img {
+        max-width: 265px;
+        max-height: 265px;
+      }
+      #preview.maximized img {
+        max-width: 100%;
+        max-height: 100%;
+      }
+
+      #preview-iframe {
+        display: block;
+        border: none;
+        width: 300px;
+        height: 300px;
+        margin-top: 0;
+      }
+
+      #preview.maximized #preview-iframe {
+        width: 100%;
+        min-height: 100%;
+      }
+    </style>
+    <header>
+      <h1>Preview</h1>
+    </header>
+    <ul class="toolbar toolbar2right">
+      <li></li>
+      <template if="{{ !maximized }}">
+      <li><button class="blue-button" on-click="{{ maximize }}"><i class="fa fa-arrows-alt"></i> Maximize</button></li>
+      </template>
+      <template if="{{ maximized }}">
+      <li><button class="blue-button" on-click="{{ minimize }}"><i class="fa fa-arrow-right"></i> Minimize</button></li>
+      </template>
+    </ul>
+    <div id="preview" class="{{ { maximized: maximized } | tokenList }}"></div>
+  </template>
+  
+</polymer-element>
+
+<polymer-element name="noflo-runtime-selector" attributes="graph" class="modal-content" assetpath="elements/">
+  <template>
+    <style>
+      :host {
+        top: calc(50% - 220px) !important;
+      }
+      ul.runtimes {
+        padding: 0px;
+        margin-top: 36px;
+        margin-left: -9px;
+        margin-right: -9px;
+        margin-bottom: 18px;
+        list-style: none;
+      }
+      ul.runtimes li {
+        width: 274px;
+        height: 105px;
+        overflow: hidden;
+        display: inline-block;
+        text-align: center;
+        background-color: hsl(192, 25%, 75%);
+        color: hsl(189, 50%, 80%);
+        transition: background-color 0.3s ease-in-out;
+        border-radius: 3px;
+        margin-right: 9px;
+        margin-left: 9px;
+        margin-bottom: 18px;
+        position: relative;
+        cursor: pointer;
+      }
+      ul.runtimes li.selected,
+      ul.runtimes li:hover {
+        background-color: hsl(190, 100%, 30%);
+        color: white;
+        cursor: default;
+      }
+      ul.runtimes li h2 {
+        position: absolute;
+        top: 36px;
+        line-height: 36px;
+        width: 180px;
+        text-transform: none;
+        font-size: 10px;
+        text-align: left;
+        white-space: nowrap;
+        left: 18px;
+        padding: 0px;
+        margin: 0px;
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
+      ul.runtimes li p {
+        position: absolute;
+        top: 53px;
+        left: 18px;
+        width: 180px;
+        text-transform: uppercase;
+        font-size: 8px;
+        text-align: left;
+        max-height: 36px;
+        overflow: hidden;
+        color: hsl(189, 50%, 80%);
+      }
+    </style>
+    <h1>Select runtime for {{ graph.name }}</h1>
+    <template if="{{ available.length }}">
+      <ul class="runtimes">
+        <template repeat="{{ runtime in available }}">
+        <li on-click="{{ selectRuntime }}" data-id="{{ runtime.id }}" class="{{ runtime.type }}">
+          <h2>{{ runtime.label }}</h2>
+          <p>{{ runtime.address }}</p>
+        </li>
+        </template>
+      </ul>
+    </template>
+    <template if="{{ !available.length }}">
+      <p>No compatible runtimes available.</p>
+    </template>
+    <div class="toolbar">
+      <button on-click="{{ close }}">Cancel</button>
+    </div>
+  </template>
+  
+</polymer-element>
+
+<polymer-element name="noflo-runtime" attributes="graphs edges runtimes" class="gpu" assetpath="elements/">
+  <template>
+    <style>
+      :host {
+        position: fixed;
+        right: 36px;
+        padding-left: 18px;
+        box-sizing: border-box;
+        top: 0;
+        color: hsl(189, 50%, 80%);
+        width: 288px;
+        height: 72px;
+        background-color: hsla(0, 0%, 0%, 0.98) !important;
+        background-image: radial-gradient(1px at 0px 0px, hsl(210, 50%, 60%) 0.5px, hsla(0, 0%, 0%, 0) 1px);
+        background-size: calc(100% - 1px);
+        background-position: 0px;
+        border-bottom: 1px hsla(190, 90%, 80%, 0.3) solid;
+      }
+
+      h2 {
+        font-size: 14px;
+        width: 216px;
+        font-weight: normal;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        line-height: 36px;
+        margin: 0px;
+        padding: 0px;
+      }
+
+      button {
+        width: 36px;
+        height: 36px;
+        font-size: 10px;
+        background-color: transparent;
+        border: none;
+        color: white;
+        text-align: center;
+      }
+
+      #address h2 {
+        position: absolute;
+        left: 54px;
+        width: 180px;
+        top: 0px;
+        color: hsl(189, 50%, 80%);
+      }
+
+      #address, #address button {
+        color: #e70215;
+      }
+      .online#address, .online#address button {
+        color: #01d159;
+      }
+      #address button.clear {
+        position: absolute;
+        right: 0px;
+        color: hsl(189, 50%, 80%);
+      }
+
+      #runcontrol h2 {
+        position: absolute;
+        left: 54px;
+        top: 36px;
+      }
+      #runcontrol button {
+        color: hsl(189, 50%, 80%);
+      }
+
+      #select {
+        text-align: center;
+      }
+      #select button.select {
+        width: auto;
+        height: auto;
+        background-color: hsl(190, 90%, 45%);
+        color: hsla(0, 0%, 0%, 0.98);
+        border: none;
+        font-size: 13px;
+        border-radius: 3px;
+        font-family: "SourceCodePro",Helvetica,Arial,sans-serif;
+        height: 36px;
+        padding-left: 36px;
+        padding-right: 36px;
+        margin: 0px;
+        margin-top: 18px;
+      }
+    </style>
+    <template if="{{ currentGraph }}">
+      <template if="{{ runtime }}">
+          <div id="address" class="{{ { online: online } | tokenList }}">
+            <button on-click="{{ reconnect }}"><i class="fa fa-refresh"></i></button>
+            <h2>{{ runtime.definition.address }}</h2>
+            <template if="{{ runtime.definition.protocol != &apos;iframe&apos; }}">
+            <button on-click="{{ clearRuntime }}" class="clear"><i class="fa fa-exchange"></i></button>
+            </template>
+          </div>
+        <div id="runcontrol">
+          <template if="{{ online }}">
+            <template if="{{ execution.running }}">
+              <button class="stop" on-click="{{ stop }}"><i class="fa fa-pause"></i></button>
+            </template>
+            <template if="{{ execution.running == false }}">
+              <button class="start" on-click="{{ start }}"><i class="fa fa-play"></i></button>
+            </template>
+            <h2>{{ execution.label }}</h2>
+          </template>
+        </div>
+      </template>
+      <template if="{{ !runtime }}">
+        <div id="select">
+          <button on-click="{{ selectRuntime }}" class="select">Select runtime</button>
+        </div>
+      </template>
+    </template>
+  </template>
+  
+</polymer-element>
+
+    <noflo-polymer name="noflo-runtime" inports="graphs edges panel runtimes runtime" outports="runtime changed"></noflo-polymer>
+    <polymer-element name="noflo-edge-menu" attributes="edges" class="the-card-content sticky-head" assetpath="elements/">
+  <template>
+    <style>
+      ul.routes {
+        margin: 0;
+        margin-left: 0px;
+        margin-right: 0px;
+        padding-top: 10px;
+      }
+      ul.routes li {
+        display: inline-block;
+        position: relative;
+        float: left;
+        margin: 0px;
+        height: 26px;
+      }
+      ul.routes li button:hover {
+        opacity: 1;
+      }
+      ul.routes li button {
+        opacity: 0.7;
+        display: block;
+        padding: 0px;
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        -webkit-box-sizing: border-box;
+           -mox-box-sizing: border-box;
+                box-sizing: border-box;
+        border: none;
+      }
+
+      .routes button {
+        width: 25px !important;
+        height: 20px !important;
+        background-color: hsla(  0, 98%, 100%, .8); 
+        border: 1px solid hsl(  0, 98%, 46%);
+      }
+      .routes button.route0  { 
+        background-color: hsla(  0, 98%, 100%, .8); 
+        border-color:      hsl(  0, 98%, 46%); 
+      }
+      .routes button.route1  { 
+        background-color: hsla(  0, 98%, 46%, .8); 
+        border-color:      hsl(  0, 98%, 46%); 
+      }
+      .routes button.route2  { 
+        background-color: hsla( 35, 98%, 46%, .8); 
+        border-color:      hsl( 35, 98%, 46%); 
+      }
+      .routes button.route3  { 
+        background-color: hsla( 60, 98%, 46%, .8); 
+        border-color:      hsl( 60, 98%, 46%); 
+      }
+      .routes button.route4  { 
+        background-color: hsla(135, 98%, 46%, .8); 
+        border-color:      hsl(135, 98%, 46%); 
+      }
+      .routes button.route5  { 
+        background-color: hsla(160, 98%, 46%, .8); 
+        border-color:      hsl(160, 98%, 46%);
+      }
+      .routes button.route6  { 
+        background-color: hsla(185, 98%, 46%, .8); 
+        border-color:      hsl(185, 98%, 46%);
+      }
+      .routes button.route7  { 
+        background-color: hsla(210, 98%, 46%, .8); 
+        border-color:      hsl(210, 98%, 46%);
+      }
+      .routes button.route8  { 
+        background-color: hsla(285, 98%, 46%, .8); 
+        border-color:      hsl(285, 98%, 46%);
+      }
+      .routes button.route9  { 
+        background-color: hsla(310, 98%, 46%, .8); 
+        border-color:      hsl(310, 98%, 46%);
+      }
+      .routes button.route10 { 
+        background-color: hsla(335, 98%, 46%, .8); 
+        border-color:      hsl(335, 98%, 46%);
+      }
+      
+      .routes  button.route0:hover  { background-color: hsla(  0, 98%, 100%, 1); }
+      .routes  button.route1:hover  { background-color: hsla(  0, 98%, 46%, 1); }
+      .routes  button.route2:hover  { background-color: hsla( 35, 98%, 46%, 1); }
+      .routes  button.route3:hover  { background-color: hsla( 60, 98%, 46%, 1); }
+      .routes  button.route4:hover  { background-color: hsla(135, 98%, 46%, 1); }
+      .routes  button.route5:hover  { background-color: hsla(160, 98%, 46%, 1); }
+      .routes  button.route6:hover  { background-color: hsla(185, 98%, 46%, 1); }
+      .routes  button.route7:hover  { background-color: hsla(210, 98%, 46%, 1); }
+      .routes  button.route8:hover  { background-color: hsla(285, 98%, 46%, 1); }
+      .routes  button.route9:hover  { background-color: hsla(310, 98%, 46%, 1); }
+      .routes button.route10:hover  { background-color: hsla(335, 98%, 46%, 1); }
+      
+    </style>
+    <header>
+      <h1 class="clear" on-click="{{ clear }}">{{ edges.length}} <template if="{{ edges.length &gt; 1 }}">Edges</template><template if="{{ edges.length == 1 }}">Edge</template></h1>    
+    </header>
+    <ul class="toolbar toolbar2right">
+    </ul>
+    <ul class="routes">
+      <template repeat="{{ route in routes }}">
+        <li><button name="{{ route }}" class="route{{ route }}" on-click="{{ setRoute }}"></button></li>
+      </template>
+    </ul>    
+  </template>
+  
+</polymer-element>
+
+<polymer-element name="noflo-edge-inspector" attributes="edge graph showlogs" class="the-card-content" assetpath="elements/">
+  <template>
+    <style>
+      h1 {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-size: 10px;
+        width: 100%;
+      }
+      h1 .connection {
+        text-transform: uppercase;
+        font-size: 9px;
+      }
+      h1 .connection.route0 { color: #fff; }
+      h1 .connection.route1 { color: hsl(  0,  98%, 46%); }
+      h1 .connection.route2 { color: hsl( 35,  98%, 46%); }
+      h1 .connection.route3 { color: hsl( 60,  98%, 46%); }
+      h1 .connection.route4 { color: hsl(135,  98%, 46%); }
+      h1 .connection.route5 { color: hsl(160,  98%, 46%); }
+      h1 .connection.route6 { color: hsl(185,  98%, 46%); }
+      h1 .connection.route7 { color: hsl(210,  98%, 46%); }
+      h1 .connection.route8 { color: hsl(285,  98%, 46%); }
+      h1 .connection.route9 { color: hsl(310,  98%, 46%); }
+      h1 .connection.route10 {color: hsl(335,  98%, 46%); }
+
+      ul#events {
+        max-height: 140px;
+        overflow-x: hidden;
+        overflow-y: auto;
+        clear: left;
+      }
+      ul#events li {
+        font-size: 10px;
+        line-height: 14px;
+        margin-bottom: 0px;
+        color: hsl(185,100%,75%);
+        max-height: 56px;
+        overflow: hidden;
+        margin-bottom: 2px;
+        padding-bottom: 2px;
+        border-bottom: 1px solid hsla(190, 30%, 2%, 0.4);
+      }
+      ul#events li.connect {
+        border-top: 1px solid #80ff80;
+        height: 3px;
+        margin-bottom: 3px;
+      }
+      ul#events li.begingroup {
+        color: hsl(189, 50%, 80%);
+      }
+      ul#events li.begingroup:before {
+        display: inline;
+        content: '<';
+      }
+      ul#events li.begingroup:after {
+        display: inline;
+        content: '>';
+      }
+      ul#events li.endgroup {
+        color: hsl(189, 50%, 80%);
+      }
+      ul#events li.endgroup:before {
+        display: inline;
+        content: '</';
+      }
+      ul#events li.endgroup:after {
+        display: inline;
+        content: '>';
+      }
+      ul#events li.disconnect {
+        border-bottom: 1px solid #ff8080;
+        height: 3px;
+        margin-bottom: 3px;
+      }
+      button#clear {
+        color: rgb(179, 222, 230);
+        position: absolute;
+        right: 0px;
+        top: 9px;
+        line-height: 36px;
+        background-color: hsla(0, 0%, 0%, 0.7);
+      }
+    </style>
+    <h1>{{ sourceNode }} <span class="connection route{{ route }}">{{ sourcePort }} &#10142; {{ targetPort }}</span> {{ targetNode }}</h1>
+    <button id="clear" on-click="{{ clear }}" title="Clear log"><i class="fa fa-ban"></i></button>
+    <ul id="events">
+    </ul>
+  </template>
+  
+</polymer-element>
+
+<polymer-element name="noflo-packets" assetpath="elements/">
+
+</polymer-element>
+
+    <noflo-polymer name="noflo-packets" inports="runtime currentgraph edges packet panel" outports=""></noflo-polymer>
+    <polymer-element name="noflo-menu" assetpath="elements/">
+  <template>
+    <ul class="toolbar2right">
+      <template repeat="{{ buttons }}">
+        <li><button on-click="{{ clicked }}" id="{{ id }}"><i class="fa fa-{{ icon }}"></i> {{ label }}</button></li>
+      </template>
+    </ul>
+  </template>
+  
+</polymer-element>
+
+<polymer-element name="noflo-search-results" attributes="search results" assetpath="elements/">
+  <template>
+    <style>
+      .search-results-header h1 {
+        color: hsla(188, 15%, 60%, 0.8);
+        padding-left: 25px;
+        font-size: 12px !important;
+      }
+      .search-results-header i {
+        padding: 0;
+        margin: 0;
+        line-height: 36px;
+        width: 36px;
+        left: -10px;
+        position: absolute;
+        text-align: center;
+      }
+
+      .search-results-list {
+        -webkit-box-sizing: border-box;
+        -mox-box-sizing: border-box;
+        box-sizing: border-box;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        background-color: black;
+        width: calc(72px * 4);
+        border-right: 1px solid hsla(190, 90%, 80%, 0.3);
+      }
+    
+      .search-results-item {
+        -webkit-box-sizing: border-box;
+        -mox-box-sizing: border-box;
+        box-sizing: border-box;
+        min-height: 36px;
+        position: relative;
+        cursor: cell;
+        padding-top: 18px !important;
+        width: calc(72px * 4 - 27px);
+      }
+      .search-results-item i {
+        color: hsla(191, 100%, 92%, 0.898039);
+        position: absolute;
+        top: 18px;
+        left: 0;
+        width: 36px;
+        text-align: center;
+        padding: 0;
+        margin: 0;   
+      }
+      .search-results-item h2 {
+        position: absolute;
+        margin: 0;
+        display: block;
+        left: 36px;
+        top: 18px;
+        height: 36px;
+        width: calc(100% - 36px);
+        font-size: 12px;
+        text-overflow: ellipsis;
+        text-transform: uppercase;
+        white-space: nowrap;
+        overflow-x: hidden;
+      }
+      .search-results-item p {
+        position: relative;
+        display: block;
+        left: 8px;
+        padding: 0px;
+        margin: 0px;
+        margin-top: 24px;
+        height: auto;
+        line-height: calc(36px / 3);
+        font-size: 10px;
+        color: hsla(188, 15%, 60%, 0.8);
+        text-shadow: hsl(0, 0%, 0%) 0px 1px 1px;
+      }
+
+    </style>
+    <ul class="search-results-list">
+      <template repeat="{{ result, index in results }}">
+        <li class="search-results-item" data-index="{{ index }}" on-click="{{ clicked }}">
+          <i class="fa fa-{{ result.icon }}"></i>
+          <h2>{{ result.label }}</h2>
+          <p>{{ result.description }}</p>
+        </li>
+      </template>
+    </ul>
+  </template>
+  
+</polymer-element>
+
+
+<script src="bower_components/codemirror/lib/codemirror.js"></script>
+<script src="bower_components/codemirror/mode/htmlmixed/htmlmixed.js"></script>
+
+<polymer-element name="noflo-graph-inspector" attributes="graph" class="modal-content" assetpath="elements/">
+  <template>
+    <style>
+      :host {
+        top: calc(50% - 371px) !important;
+      }
+      textarea {
+        height: 144px;
+      }
+      p {
+        font-size: 13px;
+        line-height: 18px;
+      }
+      p a {
+        color: color: rgb(0, 127, 153);
+        text-decoration: none;
+      }
+      a#download {
+        position: absolute;
+        right: 36px;
+        top: 36px;
+        width: 36px;
+        display: block;
+        height: 36px;
+        line-height: 36px;
+        background-color: rgb(0, 127, 153);
+        text-align: center;
+        border-radius: 6px;
+        color: white;
+      }
+    </style>
+    <style>/* BASICS */
+
+.CodeMirror {
+  /* Set height, width, borders, and global font properties here */
+  font-family: monospace;
+  height: 300px;
+}
+.CodeMirror-scroll {
+  /* Set scrolling behaviour here */
+  overflow: auto;
+}
+
+/* PADDING */
+
+.CodeMirror-lines {
+  padding: 4px 0; /* Vertical padding around content */
+}
+.CodeMirror pre {
+  padding: 0 4px; /* Horizontal padding of content */
+}
+
+.CodeMirror-scrollbar-filler, .CodeMirror-gutter-filler {
+  background-color: white; /* The little square between H and V scrollbars */
+}
+
+/* GUTTER */
+
+.CodeMirror-gutters {
+  border-right: 1px solid #ddd;
+  background-color: #f7f7f7;
+  white-space: nowrap;
+}
+.CodeMirror-linenumbers {}
+.CodeMirror-linenumber {
+  padding: 0 3px 0 5px;
+  min-width: 20px;
+  text-align: right;
+  color: #999;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+}
+
+/* CURSOR */
+
+.CodeMirror div.CodeMirror-cursor {
+  border-left: 1px solid black;
+  z-index: 3;
+}
+/* Shown when moving in bi-directional text */
+.CodeMirror div.CodeMirror-secondarycursor {
+  border-left: 1px solid silver;
+}
+.CodeMirror.cm-keymap-fat-cursor div.CodeMirror-cursor {
+  width: auto;
+  border: 0;
+  background: #7e7;
+  z-index: 1;
+}
+/* Can style cursor different in overwrite (non-insert) mode */
+.CodeMirror div.CodeMirror-cursor.CodeMirror-overwrite {}
+
+.cm-tab { display: inline-block; }
+
+.CodeMirror-ruler {
+  border-left: 1px solid #ccc;
+  position: absolute;
+}
+
+/* DEFAULT THEME */
+
+.cm-s-default .cm-keyword {color: #708;}
+.cm-s-default .cm-atom {color: #219;}
+.cm-s-default .cm-number {color: #164;}
+.cm-s-default .cm-def {color: #00f;}
+.cm-s-default .cm-variable {color: black;}
+.cm-s-default .cm-variable-2 {color: #05a;}
+.cm-s-default .cm-variable-3 {color: #085;}
+.cm-s-default .cm-property {color: black;}
+.cm-s-default .cm-operator {color: black;}
+.cm-s-default .cm-comment {color: #a50;}
+.cm-s-default .cm-string {color: #a11;}
+.cm-s-default .cm-string-2 {color: #f50;}
+.cm-s-default .cm-meta {color: #555;}
+.cm-s-default .cm-qualifier {color: #555;}
+.cm-s-default .cm-builtin {color: #30a;}
+.cm-s-default .cm-bracket {color: #997;}
+.cm-s-default .cm-tag {color: #170;}
+.cm-s-default .cm-attribute {color: #00c;}
+.cm-s-default .cm-header {color: blue;}
+.cm-s-default .cm-quote {color: #090;}
+.cm-s-default .cm-hr {color: #999;}
+.cm-s-default .cm-link {color: #00c;}
+
+.cm-negative {color: #d44;}
+.cm-positive {color: #292;}
+.cm-header, .cm-strong {font-weight: bold;}
+.cm-em {font-style: italic;}
+.cm-link {text-decoration: underline;}
+
+.cm-s-default .cm-error {color: #f00;}
+.cm-invalidchar {color: #f00;}
+
+div.CodeMirror span.CodeMirror-matchingbracket {color: #0f0;}
+div.CodeMirror span.CodeMirror-nonmatchingbracket {color: #f22;}
+.CodeMirror-activeline-background {background: #e8f2ff;}
+
+/* STOP */
+
+/* The rest of this file contains styles related to the mechanics of
+   the editor. You probably shouldn't touch them. */
+
+.CodeMirror {
+  line-height: 1;
+  position: relative;
+  overflow: hidden;
+  background: white;
+  color: black;
+}
+
+.CodeMirror-scroll {
+  /* 30px is the magic margin used to hide the element's real scrollbars */
+  /* See overflow: hidden in .CodeMirror */
+  margin-bottom: -30px; margin-right: -30px;
+  padding-bottom: 30px;
+  height: 100%;
+  outline: none; /* Prevent dragging from highlighting the element */
+  position: relative;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+}
+.CodeMirror-sizer {
+  position: relative;
+  border-right: 30px solid transparent;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+}
+
+/* The fake, visible scrollbars. Used to force redraw during scrolling
+   before actuall scrolling happens, thus preventing shaking and
+   flickering artifacts. */
+.CodeMirror-vscrollbar, .CodeMirror-hscrollbar, .CodeMirror-scrollbar-filler, .CodeMirror-gutter-filler {
+  position: absolute;
+  z-index: 6;
+  display: none;
+}
+.CodeMirror-vscrollbar {
+  right: 0; top: 0;
+  overflow-x: hidden;
+  overflow-y: scroll;
+}
+.CodeMirror-hscrollbar {
+  bottom: 0; left: 0;
+  overflow-y: hidden;
+  overflow-x: scroll;
+}
+.CodeMirror-scrollbar-filler {
+  right: 0; bottom: 0;
+}
+.CodeMirror-gutter-filler {
+  left: 0; bottom: 0;
+}
+
+.CodeMirror-gutters {
+  position: absolute; left: 0; top: 0;
+  padding-bottom: 30px;
+  z-index: 3;
+}
+.CodeMirror-gutter {
+  white-space: normal;
+  height: 100%;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+  padding-bottom: 30px;
+  margin-bottom: -32px;
+  display: inline-block;
+  /* Hack to make IE7 behave */
+  *zoom:1;
+  *display:inline;
+}
+.CodeMirror-gutter-elt {
+  position: absolute;
+  cursor: default;
+  z-index: 4;
+}
+
+.CodeMirror-lines {
+  cursor: text;
+}
+.CodeMirror pre {
+  /* Reset some styles that the rest of the page might have set */
+  -moz-border-radius: 0; -webkit-border-radius: 0; border-radius: 0;
+  border-width: 0;
+  background: transparent;
+  font-family: inherit;
+  font-size: inherit;
+  margin: 0;
+  white-space: pre;
+  word-wrap: normal;
+  line-height: inherit;
+  color: inherit;
+  z-index: 2;
+  position: relative;
+  overflow: visible;
+}
+.CodeMirror-wrap pre {
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  word-break: normal;
+}
+
+.CodeMirror-linebackground {
+  position: absolute;
+  left: 0; right: 0; top: 0; bottom: 0;
+  z-index: 0;
+}
+
+.CodeMirror-linewidget {
+  position: relative;
+  z-index: 2;
+  overflow: auto;
+}
+
+.CodeMirror-widget {}
+
+.CodeMirror-wrap .CodeMirror-scroll {
+  overflow-x: hidden;
+}
+
+.CodeMirror-measure {
+  position: absolute;
+  width: 100%;
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
+}
+.CodeMirror-measure pre { position: static; }
+
+.CodeMirror div.CodeMirror-cursor {
+  position: absolute;
+  visibility: hidden;
+  border-right: none;
+  width: 0;
+}
+.CodeMirror-focused div.CodeMirror-cursor {
+  visibility: visible;
+}
+
+.CodeMirror-selected { background: #d9d9d9; }
+.CodeMirror-focused .CodeMirror-selected { background: #d7d4f0; }
+
+.cm-searching {
+  background: #ffa;
+  background: rgba(255, 255, 0, .4);
+}
+
+/* IE7 hack to prevent it from returning funny offsetTops on the spans */
+.CodeMirror span { *vertical-align: text-bottom; }
+
+@media print {
+  /* Hide the cursor when printing */
+  .CodeMirror div.CodeMirror-cursor {
+    visibility: hidden;
+  }
+}
+</style>
+    <style>/*
+  MDN-LIKE Theme - Mozilla
+  Ported to CodeMirror by Peter Kroon <plakroon@gmail.com>
+  Report bugs/issues here: https://github.com/marijnh/CodeMirror/issues
+  GitHub: @peterkroon
+
+  The mdn-like theme is inspired on the displayed code examples at: https://developer.mozilla.org/en-US/docs/Web/CSS/animation
+
+*/
+.cm-s-mdn-like.CodeMirror { color: #999; font-family: monospace; background-color: #fff; }
+.cm-s-mdn-like .CodeMirror-selected { background: #cfc !important; }
+
+.cm-s-mdn-like .CodeMirror-gutters { background: #f8f8f8; border-left: 6px solid rgba(0,83,159,0.65); color: #333; }
+.cm-s-mdn-like .CodeMirror-linenumber { color: #aaa; margin-left: 3px; }
+div.cm-s-mdn-like .CodeMirror-cursor { border-left: 2px solid #222; }
+
+.cm-s-mdn-like .cm-keyword {  color: #6262FF; }
+.cm-s-mdn-like .cm-atom { color: #F90; }
+.cm-s-mdn-like .cm-number { color:  #ca7841; }
+.cm-s-mdn-like .cm-def { color: #8DA6CE; }
+.cm-s-mdn-like span.cm-variable-2, .cm-s-mdn-like span.cm-tag { color: #690; }
+.cm-s-mdn-like span.cm-variable-3, .cm-s-mdn-like span.cm-def { color: #07a; }
+
+.cm-s-mdn-like .cm-variable { color: #07a; }
+.cm-s-mdn-like .cm-property { color: #905; }
+.cm-s-mdn-like .cm-qualifier { color: #690; }
+
+.cm-s-mdn-like .cm-operator { color: #cda869; }
+.cm-s-mdn-like .cm-comment { color:#777; font-weight:normal; }
+.cm-s-mdn-like .cm-string { color:#07a; font-style:italic; }
+.cm-s-mdn-like .cm-string-2 { color:#bd6b18; } /*?*/
+.cm-s-mdn-like .cm-meta { color: #000; } /*?*/
+.cm-s-mdn-like .cm-builtin { color: #9B7536; } /*?*/
+.cm-s-mdn-like .cm-tag { color: #997643; }
+.cm-s-mdn-like .cm-attribute { color: #d6bb6d; } /*?*/
+.cm-s-mdn-like .cm-header { color: #FF6400; }
+.cm-s-mdn-like .cm-hr { color: #AEAEAE; }
+.cm-s-mdn-like .cm-link {   color:#ad9361; font-style:italic; text-decoration:none; }
+.cm-s-mdn-like .cm-error { border-bottom: 1px solid red; }
+
+div.cm-s-mdn-like .CodeMirror-activeline-background {background: #efefff;}
+div.cm-s-mdn-like span.CodeMirror-matchingbracket {outline:1px solid grey; color: inherit;}
+
+.cm-s-mdn-like.CodeMirror { background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFcAAAAyCAYAAAAp8UeFAAAHvklEQVR42s2b63bcNgyEQZCSHCdt2vd/0tWF7I+Q6XgMXiTtuvU5Pl57ZQKkKHzEAOtF5KeIJBGJ8uvL599FRFREZhFx8DeXv8trn68RuGaC8TRfo3SNp9dlDDHedyLyTUTeRWStXKPZrjtpZxaRw5hPqozRs1N8/enzIiQRWcCgy4MUA0f+XWliDhyL8Lfyvx7ei/Ae3iQFHyw7U/59pQVIMEEPEz0G7XiwdRjzSfC3UTtz9vchIntxvry5iMgfIhJoEflOz2CQr3F5h/HfeFe+GTdLaKcu9L8LTeQb/R/7GgbsfKedyNdoHsN31uRPWrfZ5wsj/NzzRQHuToIdU3ahwnsKPxXCjJITuOsi7XLc7SG/v5GdALs7wf8JjTFiB5+QvTEfRyGOfX3Lrx8wxyQi3sNq46O7QahQiCsRFgqddjBouVEHOKDgXAQHD9gJCr5sMKkEdjwsarG/ww3BMHBU7OBjXnzdyY7SfCxf5/z6ATccrwlKuwC/jhznnPF4CgVzhhVf4xp2EixcBActO75iZ8/fM9zAs2OMzKdslgXWJ9XG8PQoOAMA5fGcsvORgv0doBXyHrCwfLJAOwo71QLNkb8n2Pl6EWiR7OCibtkPaz4Kc/0NNAze2gju3zOwekALDaCFPI5vjPFmgGY5AZqyGEvH1x7QfIb8YtxMnA/b+QQ0aQDAwc6JMFg8CbQZ4qoYEEHbRwNojuK3EHwd7VALSgq+MNDKzfT58T8qdpADrgW0GmgcAS1lhzztJmkAzcPNOQbsWEALBDSlMKUG0Eq4CLAQWvEVQ9WU57gZJwZtgPO3r9oBTQ9WO8TjqXINx8R0EYpiZEUWOF3FxkbJkgU9B2f41YBrIj5ZfsQa0M5kTgiAAqM3ShXLgu8XMqcrQBvJ0CL5pnTsfMB13oB8athpAq2XOQmcGmoACCLydx7nToa23ATaSIY2ichfOdPTGxlasXMLaL0MLZAOwAKIM+y8CmicobGdCcbbK9DzN+yYGVoNNI5iUKTMyYOjPse4A8SM1MmcXgU0toOq1yO/v8FOxlASyc7TgeYaAMBJHcY1CcCwGI/TK4AmDbDyKYBBtFUkRwto8gygiQEaByFgJ00BH2M8JWwQS1nafDXQCidWyOI8AcjDCSjCLk8ngObuAm3JAHAdubAmOaK06V8MNEsKPJOhobSprwQa6gD7DclRQdqcwL4zxqgBrQcabUiBLclRDKAlWp+etPkBaNMA0AKlrHwTdEByZAA4GM+SNluSY6wAzcMNewxmgig5Ks0nkrSpBvSaQHMdKTBAnLojOdYyGpQ254602ZILPdTD1hdlggdIm74jbTp8vDwF5ZYUeLWGJpWsh6XNyXgcYwVoJQTEhhTYkxzZjiU5npU2TaB979TQehlaAVq4kaGpiPwwwLkYUuBbQwocyQTv1tA0+1UFWoJF3iv1oq+qoSk8EQdJmwHkziIF7oOZk14EGitibAdjLYYK78H5vZOhtWpoI0ATGHs0Q8OMb4Ey+2bU2UYztCtA0wFAs7TplGLRVQCcqaFdGSPCeTI1QNIC52iWNzof6Uib7xjEp07mNNoUYmVosVItHrHzRlLgBn9LFyRHaQCtVUMbtTNhoXWiTOO9k/V8BdAc1Oq0ArSQs6/5SU0hckNy9NnXqQY0PGYo5dWJ7nINaN6o958FWin27aBaWRka1r5myvLOAm0j30eBJqCxHLReVclxhxOEN2JfDWjxBtAC7MIH1fVaGdoOp4qJYDgKtKPSFNID2gSnGldrCqkFZ+5UeQXQBIRrSwocbdZYQT/2LwRahBPBXoHrB8nxaGROST62DKUbQOMMzZIC9abkuELfQzQALWTnDNAm8KHWFOJgJ5+SHIvTPcmx1xQyZRhNL5Qci689aXMEaN/uNIWkEwDAvFpOZmgsBaaGnbs1NPa1Jm32gBZAIh1pCtG7TSH4aE0y1uVY4uqoFPisGlpP2rSA5qTecWn5agK6BzSpgAyD+wFaqhnYoSZ1Vwr8CmlTQbrcO3ZaX0NAEyMbYaAlyquFoLKK3SPby9CeVUPThrSJmkCAE0CrKUQadi4DrdSlWhmah0YL9z9vClH59YGbHx1J8VZTyAjQepJjmXwAKTDQI3omc3p1U4gDUf6RfcdYfrUp5ClAi2J3Ba6UOXGo+K+bQrjjssitG2SJzshaLwMtXgRagUNpYYoVkMSBLM+9GGiJZMvduG6DRZ4qc04DMPtQQxOjEtACmhO7K1AbNbQDEggZyJwscFpAGwENhoBeUwh3bWolhe8BTYVKxQEWrSUn/uhcM5KhvUu/+eQu0Lzhi+VrK0PrZZNDQKs9cpYUuFYgMVpD4/NxenJTiMCNqdUEUf1qZWjppLT5qSkkUZbCwkbZMSuVnu80hfSkzRbQeqCZSAh6huR4VtoM2gHAlLf72smuWgE+VV7XpE25Ab2WFDgyhnSuKbs4GuGzCjR+tIoUuMFg3kgcWKLTwRqanJQ2W00hAsenfaApRC42hbCvK1SlE0HtE9BGgneJO+ELamitD1YjjOYnNYVcraGhtKkW0EqVVeDx733I2NH581k1NNxNLG0i0IJ8/NjVaOZ0tYZ2Vtr0Xv7tPV3hkWp9EFkgS/J0vosngTaSoaG06WHi+xObQkaAdlbanP8B2+2l0f90LmUAAAAASUVORK5CYII=); }
+</style>
+    <style>/*
+Copyright (C) 2013-2014 TheGrid (Rituwall Inc.)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+ */
+.cm-s-noflo.CodeMirror {
+  color: hsl(188,6%,50%);
+  background-color: rgb(0, 0, 0);
+  font-family: "SourceCodePro",Helvetica,Arial,sans-serif !important;
+  font-size: 14px;
+  line-height: 17px;
+}
+
+.cm-s-noflo .CodeMirror-selected {
+  background: hsl(185,100%,26%) !important;
+}
+
+.cm-s-noflo .CodeMirror-gutters {
+  background-color: black;
+  border-right: 1px solid hsla(190, 90%, 80%, 0.1);
+  width: 35px;
+}
+
+.cm-s-noflo .CodeMirror-linenumber {
+  color: hsl(188, 6%, 26%);
+}
+
+.cm-s-noflo .CodeMirror-cursor {
+  border-left: 1px solid hsl(185,98%,46%) !important;
+}
+
+.cm-s-noflo span.cm-keyword {
+  color: hsl(35,100%,75%); 
+}
+
+.cm-s-noflo span.cm-atom {
+  color: hsl(35,98%,46%);
+}
+
+.cm-s-noflo span.cm-number {
+  color: hsl(160,100%,75%);
+}
+
+.cm-s-noflo span.cm-def {
+  color: hsl(210,100%,75%);
+}
+
+.cm-s-noflo span.cm-variable {
+  color: hsl(210,100%,75%);
+}
+
+.cm-s-noflo span.cm-variable-2 {
+  color: hsl(210,100%,75%);
+}
+
+.cm-s-noflo span.cm-variable-3 {
+  color: hsl(210,100%,75%);
+}
+
+.cm-s-noflo span.cm-property {
+  color: #fff;
+}
+
+.cm-s-noflo span.cm-operator {
+}
+
+.cm-s-noflo span.cm-comment {
+  color: gray;
+}
+
+.cm-s-noflo span.cm-string {
+  color: hsl(135,100%,75%);
+}
+
+.cm-s-noflo span.cm-meta {
+  color: yellow;
+}
+
+.cm-s-noflo span.cm-qualifier {
+  color: #FFF700;
+}
+
+.cm-s-noflo span.cm-builtin {
+  color: #30a;
+}
+
+.cm-s-noflo span.cm-bracket {
+    color: #cc7;
+}
+
+.cm-s-noflo span.cm-tag {
+    color: #FFBD40;
+}
+
+.cm-s-noflo span.cm-attribute {
+    color: #FFF700;
+}
+
+.cm-s-noflo span.cm-error {
+    color: #f00;
+}
+
+.cm-s-noflo .CodeMirror-activeline-background {
+    background: #27282E !important;
+}
+
+.cm-s-noflo .CodeMirror-matchingbracket {
+    outline: 1px solid grey;
+    color: white !important;
+}
+</style>
+
+    <h1 on-keydown="{{ checkUpdateName }}" on-blur="{{ updateName }}" contenteditable="">{{ graph.name }}</h1>
+    <template if="{{ downloadUrl }}">
+      <a href="{{ downloadUrl }}" id="download" download="{{ graph.properties.id }}.json"><i class="fa fa-download"></i></a>
+    </template>
+    <template if="{{ isMain }}">
+    <p>Main graph of project {{ project.name }}.</p>
+    </template>
+    <template if="{{ inGraph.length }}">
+    <p>Used as subgraph in
+    <template repeat="{{ parent in inGraph }}">
+      <a href="#project/{{ project.id }}/{{ parent.properties.id }}">
+        {{ parent.name }}
+      </a>
+    </template>
+    .</p>
+    </template>
+    <label>
+      <span>Type</span>
+      <noflo-type-selector type="{{ type }}" runtimes="{{ runtimes }}"></noflo-type-selector>
+    </label>
+    <label>
+      <span>Description</span>
+      <input type="text" value="{{ description }}">
+    </label>
+    <label id="content">
+      <template if="{{ type == &apos;noflo-browser&apos; }}">
+      <span>Preview contents</span>
+      </template>
+    </label>
+    <div class="toolbar">
+      <button on-click="{{ save }}">Save</button>
+      <a on-click="{{ close }}">Cancel</a>
+    </div>
+  </template>
+  
+</polymer-element>
+
+<polymer-element name="noflo-search" class="gpu" attributes="results graphs component" assetpath="elements/">
+  <template>
+    <style>
+      :host {
+        background-color: hsl(187, 45%, 5%);
+        position: fixed;
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0);
+        
+        left: 36px;
+        top: 0;
+        color: white;
+        width: calc(72px * 4);
+        height: 72px;
+        font-size: 10px;
+        white-space: nowrap;
+      }
+      input {
+        background-color: hsl(187, 45%, 5%);
+        background-image: none;
+        font-family: "SourceCodePro",Helvetica,Arial,sans-serif;
+        border: none;
+        padding: 0px;
+        padding-right: 10px;
+        padding-left: 10px;
+        color: white;
+        width: 245px;
+        height: 36px;
+        display: inline;
+      }
+      button {
+        width: 36px;
+        height: 36px;
+        margin: 0px;
+        margin-left: -5px;
+        padding: 0px;
+        display: inline;
+        display: inline;
+
+        font-size: 10px;
+        background-color: transparent;
+        border: none;
+        color: white;
+        text-align: center;
+      }
+
+      :host(.overlay) #breadcrumb {
+        width: calc(72px * 4);
+        display: block;
+      }
+      #breadcrumb {
+        position: relative;
+        overflow: hidden;
+        width: 0px;
+        height: 71px;
+        left: 0px;
+        top: 0px;
+        z-index: 1;
+        
+        /*transition: width 0.3s ease-in-out;*/
+        display: none;
+        /*box-sizing: border-box;*/
+
+        background-color: hsla(0, 0%, 0%, 0.98) !important;
+        background-image: radial-gradient(1px at 0px 0px, hsl(210, 50%, 60%) 0.5px, hsla(0, 0%, 0%, 0) 1px);
+        background-size: calc(100% - 1px);
+        background-position: 0px;
+        border-bottom: 1px hsla(190, 90%, 80%, 0.3) solid;
+        
+      }
+      #breadcrumb a#parentlink {
+        color: hsl(189, 50%, 80%);
+        text-decoration: none;
+        padding-right: 9px;
+      }
+      #breadcrumb i.fa-search {
+        position: absolute;
+        line-height: 72px;
+        right: 54px;
+        font-size: 15px;
+        color: hsl(189, 50%, 80%);
+        cursor: text;
+      }
+      #clear,
+      #breadcrumb #graphinspector,
+      #breadcrumb #readonly {
+        position: absolute;
+        right: 9px;
+        top: 0px;
+        line-height: 72px;
+        display: block;
+        height: 72px;
+        font-size: 15px;
+        color: hsl(189, 50%, 80%);
+      }
+      #clear {
+        color: hsl(189, 50%, 50%);
+      }
+      #breadcrumb h1 {
+        display: inline-block;
+        line-height: 72px;
+        font-size: 15px;
+        margin: 0px;
+        padding: 0px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 156px;
+        font-weight: normal;
+        padding-left: 18px;
+      }
+      :host(.overlay) #search {
+        display: none;
+      }
+      #search {
+        display: block;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        background-color: hsl(192, 25%, 92%);
+        color: black;
+        font-family: "SourceCodePro",Helvetica,Arial,sans-serif;
+        border: none;
+        padding: 0px;
+        padding-right: 54px;
+        padding-left: 18px;
+        width: calc(72px * 3 - 1px);
+        height: 71px;
+        /*box-sizing: border-box;*/
+        font-size: 12px;
+        display: inline;
+        background-image: radial-gradient(1px at 0px 0px, hsl(210, 50%, 60%) 0.5px, hsla(0, 0%, 0%, 0) 1px);
+        background-size: calc(100% - 1px);
+        background-position: 0px;
+        border-bottom: 1px hsla(190, 90%, 80%, 0.3) solid;
+        border-right: 1px hsla(190, 90%, 80%, 0.08) solid;
+        border-radius: none;
+      }
+      #search::-webkit-input-placeholder {
+        color: hsl(190, 90%, 45%);
+      }
+      #search #speech {
+        color: hsl(190, 90%, 45%);
+      }
+
+    </style>
+    <div id="breadcrumb" on-click="{{ focus }}">
+      <template if="{{ !component || !component.name }}">
+      <i class="fa fa-search"></i>
+      </template>
+      <h1>
+        <template if="{{ project &amp;&amp; parentPath }}">
+        <a href="#project/{{ project.id }}{{ parentPath }}" id="parentlink"><i class="fa fa-angle-left"></i></a>
+        </template>
+        <template if="{{ graph &amp;&amp; (!component || !component.name) }}">
+        {{ graph.name }}
+        </template>
+        <template if="{{ component &amp;&amp; component.name }}">
+        {{ component.name }}
+        </template>
+      </h1>
+      <template if="{{ graph &amp;&amp; (!component || !component.name) }}">
+      <button on-click="{{ showGraphInspector }}" id="graphinspector"><i class="fa fa-cog"></i></button>
+      </template>
+      <template if="{{ (component &amp;&amp; component.readonly) || (graph &amp;&amp; graph.properties.readonly) }}">
+      <i id="readonly" class="fa fa-lock"></i>
+      </template>
+    </div>
+    <input id="search" value="{{ search }}" type="text" placeholder="Search" autocapitalize="off" autocorrect="off" x-webkit-speech="">
+    <button id="clear" on-click="{{ clearSearch }}"><i class="fa fa-times"></i></button>
+  </template>
+  
+</polymer-element>
+
+    <noflo-polymer name="noflo-search" inports="toggle results runtimes project graphs component panel" outports="menu search"></noflo-polymer>
+    <polymer-element name="noflo-library" attributes="editor search" assetpath="elements/">
+  
+</polymer-element>
+
+    <noflo-polymer name="noflo-library" inports="editor project graphs search" outports="result"></noflo-polymer>
+    
+
+
+<polymer-element name="noflo-new-component" attributes="project" class="modal-content" assetpath="elements/">
+  <template>
+    <h1>Create new component</h1>
+    <form>
+      <label>
+        Component name
+        <input type="text" value="{{ name }}" placeholder="MyCoolComponent" required>
+      </label>
+      <label>
+        Language
+        <select name="type" value="{{ language }}">
+          <option value="coffeescript">CoffeeScript</option>
+          <option value="javascript">JavaScript</option>
+        </select>
+      </label>
+      <div class="toolbar">
+        <button on-click="{{ send }}" class="{{ { disabled: !canSend } | tokenList }}">Create</button>
+        <a on-click="{{ close }}">Cancel</a>
+      </div>
+    </form>
+  </template>
+  
+</polymer-element>
+
+<polymer-element name="noflo-project-inspector" class="modal-content" assetpath="elements/">
+  <template>
+    <h1>{{ project.name }} settings</h1>
+    <form>
+      <label>
+        <span>GitHub repository</span>
+        <input type="text" value="{{ repo }}" placeholder="username/my-project" autocapitalize="off" autocorrect="off" required>
+      </label>
+      <label>
+        <span>Project label</span>
+        <input type="text" value="{{ name }}" placeholder="My Cool Project" required>
+      </label>
+      <label>
+        <span>Main graph</span>
+        <select name="type" value="{{ main }}">
+          <template repeat="{{ graph in project.graphs }}">
+          <option value="{{ graph.properties.id }}">{{ graph.name }}</option>
+          </template>
+        </select>
+      </label>
+      <div class="toolbar">
+        <button on-click="{{ send }}">Save</button>
+        <a on-click="{{ close }}">Cancel</a>
+      </div>
+    </form>
+  </template>
+  
+</polymer-element>
+
+<polymer-element name="noflo-project" attributes="project graphs components githubtoken graphs component" assetpath="elements/">
+  <template>
+    <style>
+      h2 {
+        font-size: 16px;
+        line-height: 36px;
+        text-transform: none;
+        font-weight: normal;
+        padding: 0px;
+        margin: 0px;
+      }
+      ul.graphs {
+        margin-bottom: 144px;
+      }
+      ul.graphs li {
+        width: 245px;
+        height: 70px;
+        overflow: hidden;
+        float: left;
+        text-align: center;
+        background-color: hsl(190, 90%, 45%);
+        color: black;
+        border-radius: 3px;
+        margin-right: 0px;
+        margin-left: 0px;
+        margin-bottom: 5px;
+        position: relative;
+        cursor: pointer;
+      }
+      ul.graphs li.add {
+        background-color: hsl(192, 25%, 92%);
+        color: black;
+        cursor: default;
+      }
+      ul.graphs li the-graph-thumb {
+        display: block;
+        position: absolute;
+        left: 100px;
+        top: -20px;
+      }
+      ul.graphs li i.fa {
+        display: block;
+        position: absolute;
+        right: 17px;
+        top: 17px;
+        font-size: 36px;
+        color: black;
+      }
+      ul.graphs li button {
+        display: block;
+        position: absolute;
+        right: 17px;
+        top: 17px;
+        background-color: transparent;
+        color: hsl(190, 100%, 30%);
+        border: 1px solid hsl(190, 100%, 30%);
+        font-size: 13px;
+        border-radius: 3px;
+        font-family: "SourceCodePro",Helvetica,Arial,sans-serif;
+        height: 36px;
+        padding-left: 13px;
+        padding-right: 13px;
+      }
+      ul.graphs li h2 {
+        position: absolute;
+        top: 18px;
+        left: 17px;
+        width: 75px;
+        text-transform: none;
+        font-size: 13px;
+        text-align: left;
+        white-space: nowrap;
+      }
+      main {
+        overflow-y: auto;
+        max-height: calc(100% - 72px);
+      }
+      main.repo {
+        max-height: calc(100% - 72px * 3);
+      }
+      main::-webkit-scrollbar {
+        display: none;
+      }
+      footer {
+        background-color: transparent;
+        display: block;
+        position: absolute;
+        bottom: 0px;
+        left: 0px;
+        padding-left: 36px;
+        width: 325px;
+        padding-right: 36px;
+        box-sizing: border-box;
+        overflow: hidden;
+        height: 144px;
+        transition: background-color 0.3s ease-in-out;
+      }
+      the-panel#account[open] ::shadow footer {
+        background-color: hsl(190, 90%, 45%);
+      }
+      footer h1 {
+        font-size: 17px;
+        line-height: 36px;
+        text-align: center;
+        margin: 0;
+
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      footer textarea {
+        display: block;
+        font-size: 13px;
+        background-color: hsl(0, 0%, 10%);
+        font-family: "SourceCodePro",Helvetica,Arial,sans-serif;
+        color: white;
+        border-radius: 3px;
+        padding: 3px;
+        border: none;
+        margin: 0px;
+        width: calc(100% - 2px);
+        height: 54px;
+        box-sizing: border-box;
+        margin-left: auto;
+        margin-right: auto;
+        resize: none;
+      }
+      footer button {
+        background-color: white;
+        color: hsl(190, 90%, 45%);
+        border: none;
+        font-size: 13px;
+        border-radius: 3px;
+        font-family: "SourceCodePro",Helvetica,Arial,sans-serif;
+        height: 36px;
+        padding-left: 17px;
+        padding-right: 17px;
+        line-height: 36px;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 8px;
+        cursor: pointer;
+      }
+      footer button:disabled {
+        opacity: 0.5;
+      }
+    </style>
+    <the-panel id="account" edge="left" size="324" handle="36" automatic="false">
+      <header>
+        <template if="{{ project }}">
+        <h1>{{ project.name }}</h1>
+        </template>
+        <template if="{{ !project }}">
+        <h1>Sketch</h1>
+        </template>
+      </header>
+      <main class="{{ (project.repo ? &apos;repo&apos; : &apos;norepo&apos;) }}">
+        <ul>
+          <li><a on-click="{{ openHome }}"><i class="fa fa-home"></i>Home</a></li>
+          <template if="{{ project }}">
+          <li><a on-click="{{ openSettings }}"><i class="fa fa-cog"></i>Settings</a></li>
+          </template>
+        </ul>
+        <template if="{{ project }}">
+        <h2>Graphs</h2>
+        <ul class="graphs">
+          <li class="add">
+            <h2>New graph</h2>
+            <button on-click="{{ newGraph }}">Create</button>
+          </li>
+          <template repeat="{{ graph in project.graphs }}">
+          <li on-click="{{ openGraph }}" data-id="{{ graph.properties.id }}">
+            <the-graph-thumb graph="{{ graph }}" width="200" height="120"></the-graph-thumb>
+            <h2>{{ graph.name }}</h2>
+          </li>
+          </template>
+        </ul>
+        <template if="{{ canComponent }}">
+        <h2>Components</h2>
+        <ul class="graphs">
+          <li class="add">
+            <h2>New component</h2>
+            <button on-click="{{ newComponent }}">Create</button>
+          </li>
+          <template repeat="{{ component in project.components }}">
+          <li on-click="{{ openComponent }}" data-id="{{ component.name }}">
+            <h2>{{ component.name }}</h2>
+            <template if="{{ component.language == &apos;coffeescript&apos; }}">
+            <i class="fa fa-coffee"></i>
+            </template>
+            <template if="{{ component.language != &apos;coffeescript&apos; }}">
+            <i class="fa fa-code"></i>
+            </template>
+          </li>
+          </template>
+        </ul>
+        </template>
+        </template>
+      </main>
+      <template if="{{ project.repo &amp;&amp; githubtoken}}">
+      <footer>
+        <h1 title="{{ project.repo }}"><i class="fa fa-github"></i> {{ project.repo }}</h1>
+        <textarea placeholder="Commit message" value="{{ commitMessage }}"></textarea>
+        <button on-click="{{ upload }}" disabled?="{{commitMessage === &apos;&apos;}}" title="{{(commitMessage === &apos;&apos; ? &apos;needs commit message&apos; : &apos;&apos;)}}">
+          <i class="fa fa-cloud-upload"></i>
+          <template if="{{ graph }}">
+          Upload {{ graph.properties.name }}
+          </template>
+          <template if="{{ component &amp;&amp; !graph }}">
+          Upload {{ component.name }}
+          </template>
+        </button>
+      </footer>
+      </template>
+    </the-panel>
+  </template>
+  
+</polymer-element>
+
+    <noflo-polymer name="noflo-project" inports="project runtimes runtime graphs components githubtoken graphs component" outports="newgraph newcomponent changed upload"></noflo-polymer>
+    <polymer-element name="noflo-component-editor" attributes="component width height" assetpath="elements/">
+  <template>
+    <style type="text/css">
+      :host {
+        background-color: black;
+        overflow: hidden;
+      }
+      .CodeMirror {
+        height: 100%;
+        cursor: text;
+      }
+      .CodeMirror-scroll {
+        height: 100%;
+      }
+      #code,
+      #tests {
+        display: block;
+        width: 50%;
+        height: 100%;
+        position: absolute;
+        left: 0px;
+        top: 72px;
+      }
+      #tests {
+        left: auto;
+        right: 0px;
+      }
+      #code h1,
+      #tests h1 {
+        margin: 0;
+        line-height: 36px;
+        padding-left: 36px;
+        font-size: 14px;
+        text-transform: uppercase;
+        color: white;
+      }
+      #code h1 {
+        text-align: right;
+      }
+    </style>
+    <style>/* BASICS */
+
+.CodeMirror {
+  /* Set height, width, borders, and global font properties here */
+  font-family: monospace;
+  height: 300px;
+}
+.CodeMirror-scroll {
+  /* Set scrolling behaviour here */
+  overflow: auto;
+}
+
+/* PADDING */
+
+.CodeMirror-lines {
+  padding: 4px 0; /* Vertical padding around content */
+}
+.CodeMirror pre {
+  padding: 0 4px; /* Horizontal padding of content */
+}
+
+.CodeMirror-scrollbar-filler, .CodeMirror-gutter-filler {
+  background-color: white; /* The little square between H and V scrollbars */
+}
+
+/* GUTTER */
+
+.CodeMirror-gutters {
+  border-right: 1px solid #ddd;
+  background-color: #f7f7f7;
+  white-space: nowrap;
+}
+.CodeMirror-linenumbers {}
+.CodeMirror-linenumber {
+  padding: 0 3px 0 5px;
+  min-width: 20px;
+  text-align: right;
+  color: #999;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+}
+
+/* CURSOR */
+
+.CodeMirror div.CodeMirror-cursor {
+  border-left: 1px solid black;
+  z-index: 3;
+}
+/* Shown when moving in bi-directional text */
+.CodeMirror div.CodeMirror-secondarycursor {
+  border-left: 1px solid silver;
+}
+.CodeMirror.cm-keymap-fat-cursor div.CodeMirror-cursor {
+  width: auto;
+  border: 0;
+  background: #7e7;
+  z-index: 1;
+}
+/* Can style cursor different in overwrite (non-insert) mode */
+.CodeMirror div.CodeMirror-cursor.CodeMirror-overwrite {}
+
+.cm-tab { display: inline-block; }
+
+.CodeMirror-ruler {
+  border-left: 1px solid #ccc;
+  position: absolute;
+}
+
+/* DEFAULT THEME */
+
+.cm-s-default .cm-keyword {color: #708;}
+.cm-s-default .cm-atom {color: #219;}
+.cm-s-default .cm-number {color: #164;}
+.cm-s-default .cm-def {color: #00f;}
+.cm-s-default .cm-variable {color: black;}
+.cm-s-default .cm-variable-2 {color: #05a;}
+.cm-s-default .cm-variable-3 {color: #085;}
+.cm-s-default .cm-property {color: black;}
+.cm-s-default .cm-operator {color: black;}
+.cm-s-default .cm-comment {color: #a50;}
+.cm-s-default .cm-string {color: #a11;}
+.cm-s-default .cm-string-2 {color: #f50;}
+.cm-s-default .cm-meta {color: #555;}
+.cm-s-default .cm-qualifier {color: #555;}
+.cm-s-default .cm-builtin {color: #30a;}
+.cm-s-default .cm-bracket {color: #997;}
+.cm-s-default .cm-tag {color: #170;}
+.cm-s-default .cm-attribute {color: #00c;}
+.cm-s-default .cm-header {color: blue;}
+.cm-s-default .cm-quote {color: #090;}
+.cm-s-default .cm-hr {color: #999;}
+.cm-s-default .cm-link {color: #00c;}
+
+.cm-negative {color: #d44;}
+.cm-positive {color: #292;}
+.cm-header, .cm-strong {font-weight: bold;}
+.cm-em {font-style: italic;}
+.cm-link {text-decoration: underline;}
+
+.cm-s-default .cm-error {color: #f00;}
+.cm-invalidchar {color: #f00;}
+
+div.CodeMirror span.CodeMirror-matchingbracket {color: #0f0;}
+div.CodeMirror span.CodeMirror-nonmatchingbracket {color: #f22;}
+.CodeMirror-activeline-background {background: #e8f2ff;}
+
+/* STOP */
+
+/* The rest of this file contains styles related to the mechanics of
+   the editor. You probably shouldn't touch them. */
+
+.CodeMirror {
+  line-height: 1;
+  position: relative;
+  overflow: hidden;
+  background: white;
+  color: black;
+}
+
+.CodeMirror-scroll {
+  /* 30px is the magic margin used to hide the element's real scrollbars */
+  /* See overflow: hidden in .CodeMirror */
+  margin-bottom: -30px; margin-right: -30px;
+  padding-bottom: 30px;
+  height: 100%;
+  outline: none; /* Prevent dragging from highlighting the element */
+  position: relative;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+}
+.CodeMirror-sizer {
+  position: relative;
+  border-right: 30px solid transparent;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+}
+
+/* The fake, visible scrollbars. Used to force redraw during scrolling
+   before actuall scrolling happens, thus preventing shaking and
+   flickering artifacts. */
+.CodeMirror-vscrollbar, .CodeMirror-hscrollbar, .CodeMirror-scrollbar-filler, .CodeMirror-gutter-filler {
+  position: absolute;
+  z-index: 6;
+  display: none;
+}
+.CodeMirror-vscrollbar {
+  right: 0; top: 0;
+  overflow-x: hidden;
+  overflow-y: scroll;
+}
+.CodeMirror-hscrollbar {
+  bottom: 0; left: 0;
+  overflow-y: hidden;
+  overflow-x: scroll;
+}
+.CodeMirror-scrollbar-filler {
+  right: 0; bottom: 0;
+}
+.CodeMirror-gutter-filler {
+  left: 0; bottom: 0;
+}
+
+.CodeMirror-gutters {
+  position: absolute; left: 0; top: 0;
+  padding-bottom: 30px;
+  z-index: 3;
+}
+.CodeMirror-gutter {
+  white-space: normal;
+  height: 100%;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+  padding-bottom: 30px;
+  margin-bottom: -32px;
+  display: inline-block;
+  /* Hack to make IE7 behave */
+  *zoom:1;
+  *display:inline;
+}
+.CodeMirror-gutter-elt {
+  position: absolute;
+  cursor: default;
+  z-index: 4;
+}
+
+.CodeMirror-lines {
+  cursor: text;
+}
+.CodeMirror pre {
+  /* Reset some styles that the rest of the page might have set */
+  -moz-border-radius: 0; -webkit-border-radius: 0; border-radius: 0;
+  border-width: 0;
+  background: transparent;
+  font-family: inherit;
+  font-size: inherit;
+  margin: 0;
+  white-space: pre;
+  word-wrap: normal;
+  line-height: inherit;
+  color: inherit;
+  z-index: 2;
+  position: relative;
+  overflow: visible;
+}
+.CodeMirror-wrap pre {
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  word-break: normal;
+}
+
+.CodeMirror-linebackground {
+  position: absolute;
+  left: 0; right: 0; top: 0; bottom: 0;
+  z-index: 0;
+}
+
+.CodeMirror-linewidget {
+  position: relative;
+  z-index: 2;
+  overflow: auto;
+}
+
+.CodeMirror-widget {}
+
+.CodeMirror-wrap .CodeMirror-scroll {
+  overflow-x: hidden;
+}
+
+.CodeMirror-measure {
+  position: absolute;
+  width: 100%;
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
+}
+.CodeMirror-measure pre { position: static; }
+
+.CodeMirror div.CodeMirror-cursor {
+  position: absolute;
+  visibility: hidden;
+  border-right: none;
+  width: 0;
+}
+.CodeMirror-focused div.CodeMirror-cursor {
+  visibility: visible;
+}
+
+.CodeMirror-selected { background: #d9d9d9; }
+.CodeMirror-focused .CodeMirror-selected { background: #d7d4f0; }
+
+.cm-searching {
+  background: #ffa;
+  background: rgba(255, 255, 0, .4);
+}
+
+/* IE7 hack to prevent it from returning funny offsetTops on the spans */
+.CodeMirror span { *vertical-align: text-bottom; }
+
+@media print {
+  /* Hide the cursor when printing */
+  .CodeMirror div.CodeMirror-cursor {
+    visibility: hidden;
+  }
+}
+</style>
+    <style>/*
+  MDN-LIKE Theme - Mozilla
+  Ported to CodeMirror by Peter Kroon <plakroon@gmail.com>
+  Report bugs/issues here: https://github.com/marijnh/CodeMirror/issues
+  GitHub: @peterkroon
+
+  The mdn-like theme is inspired on the displayed code examples at: https://developer.mozilla.org/en-US/docs/Web/CSS/animation
+
+*/
+.cm-s-mdn-like.CodeMirror { color: #999; font-family: monospace; background-color: #fff; }
+.cm-s-mdn-like .CodeMirror-selected { background: #cfc !important; }
+
+.cm-s-mdn-like .CodeMirror-gutters { background: #f8f8f8; border-left: 6px solid rgba(0,83,159,0.65); color: #333; }
+.cm-s-mdn-like .CodeMirror-linenumber { color: #aaa; margin-left: 3px; }
+div.cm-s-mdn-like .CodeMirror-cursor { border-left: 2px solid #222; }
+
+.cm-s-mdn-like .cm-keyword {  color: #6262FF; }
+.cm-s-mdn-like .cm-atom { color: #F90; }
+.cm-s-mdn-like .cm-number { color:  #ca7841; }
+.cm-s-mdn-like .cm-def { color: #8DA6CE; }
+.cm-s-mdn-like span.cm-variable-2, .cm-s-mdn-like span.cm-tag { color: #690; }
+.cm-s-mdn-like span.cm-variable-3, .cm-s-mdn-like span.cm-def { color: #07a; }
+
+.cm-s-mdn-like .cm-variable { color: #07a; }
+.cm-s-mdn-like .cm-property { color: #905; }
+.cm-s-mdn-like .cm-qualifier { color: #690; }
+
+.cm-s-mdn-like .cm-operator { color: #cda869; }
+.cm-s-mdn-like .cm-comment { color:#777; font-weight:normal; }
+.cm-s-mdn-like .cm-string { color:#07a; font-style:italic; }
+.cm-s-mdn-like .cm-string-2 { color:#bd6b18; } /*?*/
+.cm-s-mdn-like .cm-meta { color: #000; } /*?*/
+.cm-s-mdn-like .cm-builtin { color: #9B7536; } /*?*/
+.cm-s-mdn-like .cm-tag { color: #997643; }
+.cm-s-mdn-like .cm-attribute { color: #d6bb6d; } /*?*/
+.cm-s-mdn-like .cm-header { color: #FF6400; }
+.cm-s-mdn-like .cm-hr { color: #AEAEAE; }
+.cm-s-mdn-like .cm-link {   color:#ad9361; font-style:italic; text-decoration:none; }
+.cm-s-mdn-like .cm-error { border-bottom: 1px solid red; }
+
+div.cm-s-mdn-like .CodeMirror-activeline-background {background: #efefff;}
+div.cm-s-mdn-like span.CodeMirror-matchingbracket {outline:1px solid grey; color: inherit;}
+
+.cm-s-mdn-like.CodeMirror { background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFcAAAAyCAYAAAAp8UeFAAAHvklEQVR42s2b63bcNgyEQZCSHCdt2vd/0tWF7I+Q6XgMXiTtuvU5Pl57ZQKkKHzEAOtF5KeIJBGJ8uvL599FRFREZhFx8DeXv8trn68RuGaC8TRfo3SNp9dlDDHedyLyTUTeRWStXKPZrjtpZxaRw5hPqozRs1N8/enzIiQRWcCgy4MUA0f+XWliDhyL8Lfyvx7ei/Ae3iQFHyw7U/59pQVIMEEPEz0G7XiwdRjzSfC3UTtz9vchIntxvry5iMgfIhJoEflOz2CQr3F5h/HfeFe+GTdLaKcu9L8LTeQb/R/7GgbsfKedyNdoHsN31uRPWrfZ5wsj/NzzRQHuToIdU3ahwnsKPxXCjJITuOsi7XLc7SG/v5GdALs7wf8JjTFiB5+QvTEfRyGOfX3Lrx8wxyQi3sNq46O7QahQiCsRFgqddjBouVEHOKDgXAQHD9gJCr5sMKkEdjwsarG/ww3BMHBU7OBjXnzdyY7SfCxf5/z6ATccrwlKuwC/jhznnPF4CgVzhhVf4xp2EixcBActO75iZ8/fM9zAs2OMzKdslgXWJ9XG8PQoOAMA5fGcsvORgv0doBXyHrCwfLJAOwo71QLNkb8n2Pl6EWiR7OCibtkPaz4Kc/0NNAze2gju3zOwekALDaCFPI5vjPFmgGY5AZqyGEvH1x7QfIb8YtxMnA/b+QQ0aQDAwc6JMFg8CbQZ4qoYEEHbRwNojuK3EHwd7VALSgq+MNDKzfT58T8qdpADrgW0GmgcAS1lhzztJmkAzcPNOQbsWEALBDSlMKUG0Eq4CLAQWvEVQ9WU57gZJwZtgPO3r9oBTQ9WO8TjqXINx8R0EYpiZEUWOF3FxkbJkgU9B2f41YBrIj5ZfsQa0M5kTgiAAqM3ShXLgu8XMqcrQBvJ0CL5pnTsfMB13oB8athpAq2XOQmcGmoACCLydx7nToa23ATaSIY2ichfOdPTGxlasXMLaL0MLZAOwAKIM+y8CmicobGdCcbbK9DzN+yYGVoNNI5iUKTMyYOjPse4A8SM1MmcXgU0toOq1yO/v8FOxlASyc7TgeYaAMBJHcY1CcCwGI/TK4AmDbDyKYBBtFUkRwto8gygiQEaByFgJ00BH2M8JWwQS1nafDXQCidWyOI8AcjDCSjCLk8ngObuAm3JAHAdubAmOaK06V8MNEsKPJOhobSprwQa6gD7DclRQdqcwL4zxqgBrQcabUiBLclRDKAlWp+etPkBaNMA0AKlrHwTdEByZAA4GM+SNluSY6wAzcMNewxmgig5Ks0nkrSpBvSaQHMdKTBAnLojOdYyGpQ254602ZILPdTD1hdlggdIm74jbTp8vDwF5ZYUeLWGJpWsh6XNyXgcYwVoJQTEhhTYkxzZjiU5npU2TaB979TQehlaAVq4kaGpiPwwwLkYUuBbQwocyQTv1tA0+1UFWoJF3iv1oq+qoSk8EQdJmwHkziIF7oOZk14EGitibAdjLYYK78H5vZOhtWpoI0ATGHs0Q8OMb4Ey+2bU2UYztCtA0wFAs7TplGLRVQCcqaFdGSPCeTI1QNIC52iWNzof6Uib7xjEp07mNNoUYmVosVItHrHzRlLgBn9LFyRHaQCtVUMbtTNhoXWiTOO9k/V8BdAc1Oq0ArSQs6/5SU0hckNy9NnXqQY0PGYo5dWJ7nINaN6o958FWin27aBaWRka1r5myvLOAm0j30eBJqCxHLReVclxhxOEN2JfDWjxBtAC7MIH1fVaGdoOp4qJYDgKtKPSFNID2gSnGldrCqkFZ+5UeQXQBIRrSwocbdZYQT/2LwRahBPBXoHrB8nxaGROST62DKUbQOMMzZIC9abkuELfQzQALWTnDNAm8KHWFOJgJ5+SHIvTPcmx1xQyZRhNL5Qci689aXMEaN/uNIWkEwDAvFpOZmgsBaaGnbs1NPa1Jm32gBZAIh1pCtG7TSH4aE0y1uVY4uqoFPisGlpP2rSA5qTecWn5agK6BzSpgAyD+wFaqhnYoSZ1Vwr8CmlTQbrcO3ZaX0NAEyMbYaAlyquFoLKK3SPby9CeVUPThrSJmkCAE0CrKUQadi4DrdSlWhmah0YL9z9vClH59YGbHx1J8VZTyAjQepJjmXwAKTDQI3omc3p1U4gDUf6RfcdYfrUp5ClAi2J3Ba6UOXGo+K+bQrjjssitG2SJzshaLwMtXgRagUNpYYoVkMSBLM+9GGiJZMvduG6DRZ4qc04DMPtQQxOjEtACmhO7K1AbNbQDEggZyJwscFpAGwENhoBeUwh3bWolhe8BTYVKxQEWrSUn/uhcM5KhvUu/+eQu0Lzhi+VrK0PrZZNDQKs9cpYUuFYgMVpD4/NxenJTiMCNqdUEUf1qZWjppLT5qSkkUZbCwkbZMSuVnu80hfSkzRbQeqCZSAh6huR4VtoM2gHAlLf72smuWgE+VV7XpE25Ab2WFDgyhnSuKbs4GuGzCjR+tIoUuMFg3kgcWKLTwRqanJQ2W00hAsenfaApRC42hbCvK1SlE0HtE9BGgneJO+ELamitD1YjjOYnNYVcraGhtKkW0EqVVeDx733I2NH581k1NNxNLG0i0IJ8/NjVaOZ0tYZ2Vtr0Xv7tPV3hkWp9EFkgS/J0vosngTaSoaG06WHi+xObQkaAdlbanP8B2+2l0f90LmUAAAAASUVORK5CYII=); }
+</style>
+    <style>/*
+Copyright (C) 2013-2014 TheGrid (Rituwall Inc.)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+ */
+.cm-s-noflo.CodeMirror {
+  color: hsl(188,6%,50%);
+  background-color: rgb(0, 0, 0);
+  font-family: "SourceCodePro",Helvetica,Arial,sans-serif !important;
+  font-size: 14px;
+  line-height: 17px;
+}
+
+.cm-s-noflo .CodeMirror-selected {
+  background: hsl(185,100%,26%) !important;
+}
+
+.cm-s-noflo .CodeMirror-gutters {
+  background-color: black;
+  border-right: 1px solid hsla(190, 90%, 80%, 0.1);
+  width: 35px;
+}
+
+.cm-s-noflo .CodeMirror-linenumber {
+  color: hsl(188, 6%, 26%);
+}
+
+.cm-s-noflo .CodeMirror-cursor {
+  border-left: 1px solid hsl(185,98%,46%) !important;
+}
+
+.cm-s-noflo span.cm-keyword {
+  color: hsl(35,100%,75%); 
+}
+
+.cm-s-noflo span.cm-atom {
+  color: hsl(35,98%,46%);
+}
+
+.cm-s-noflo span.cm-number {
+  color: hsl(160,100%,75%);
+}
+
+.cm-s-noflo span.cm-def {
+  color: hsl(210,100%,75%);
+}
+
+.cm-s-noflo span.cm-variable {
+  color: hsl(210,100%,75%);
+}
+
+.cm-s-noflo span.cm-variable-2 {
+  color: hsl(210,100%,75%);
+}
+
+.cm-s-noflo span.cm-variable-3 {
+  color: hsl(210,100%,75%);
+}
+
+.cm-s-noflo span.cm-property {
+  color: #fff;
+}
+
+.cm-s-noflo span.cm-operator {
+}
+
+.cm-s-noflo span.cm-comment {
+  color: gray;
+}
+
+.cm-s-noflo span.cm-string {
+  color: hsl(135,100%,75%);
+}
+
+.cm-s-noflo span.cm-meta {
+  color: yellow;
+}
+
+.cm-s-noflo span.cm-qualifier {
+  color: #FFF700;
+}
+
+.cm-s-noflo span.cm-builtin {
+  color: #30a;
+}
+
+.cm-s-noflo span.cm-bracket {
+    color: #cc7;
+}
+
+.cm-s-noflo span.cm-tag {
+    color: #FFBD40;
+}
+
+.cm-s-noflo span.cm-attribute {
+    color: #FFF700;
+}
+
+.cm-s-noflo span.cm-error {
+    color: #f00;
+}
+
+.cm-s-noflo .CodeMirror-activeline-background {
+    background: #27282E !important;
+}
+
+.cm-s-noflo .CodeMirror-matchingbracket {
+    outline: 1px solid grey;
+    color: white !important;
+}
+</style>
+    <section id="code">
+      <h1>Implementation</h1>
+      <div id="code_editor"></div>
+    </section> 
+    <section id="tests">
+      <h1>Tests</h1>
+      <div id="tests_editor"></div>
+    </section> 
+    <script type="text/plain" id="CoffeeScriptExample">
+noflo = require 'noflo'
+
+exports.getComponent = ->
+  c = new noflo.Component
+  c.inPorts.add 'in', (event, payload) ->
+    return unless event is 'data'
+    # Do something with the packet, then
+    outPorts.out.send payload
+  c.outPorts.add 'out'
+  c
+    </script>
+    <script type="text/plain" id="JavaScriptExample">
+var noflo = require('noflo');
+
+exports.getComponent = function () {
+  var c = new noflo.Component();
+
+  c.inPorts.add('in', function (event, payload) {
+    if (event !== 'data') {
+      return;
+    }
+    // Do something with the packet, then
+    c.outPorts.out.send(payload);
+  });
+  c.outPorts.add('out');
+  return c;
+};
+    </script>
+  </template>
+  <script src="bower_components/codemirror/lib/codemirror.js"></script>
+  <script src="bower_components/codemirror/mode/javascript/javascript.js"></script>
+  <script src="bower_components/codemirror/mode/coffeescript/coffeescript.js"></script>
+  <script src="bower_components/codemirror/mode/clike/clike.js"></script>
+  
+</polymer-element>
+
+    <noflo-polymer name="noflo-component-editor" inports="component graphs theme width height" outports="changed"></noflo-polymer>
+    <!-- 
+  
+* Wraps the-graph-thumb with a current view bounding box
+* Observes changes from attached instance of the-graph-editor
+
+-->
+
+
+
+<polymer-element name="the-graph-nav" attributes="width height editor hide" touch-action="none" assetpath="bower_components/the-graph/the-graph-nav/">
+  <style>
+    #thumb, 
+    #outcanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      overflow: visible;
+    }
+    #viewrect {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 200px;
+      height: 150px;
+      border: 1px solid hsla(190, 100%, 80%, 0.4);
+      border-style: dotted;
+    }
+  </style>
+  <template>
+    <the-graph-thumb id="thumb" graph="{{ editor.nofloGraph }}" thumbrectangle="{{thumbrectangle}}" width="{{width}}" height="{{height}}" thumbscale="{{thumbscale}}" hide="{{hide}}" theme="{{ editor.theme }}">
+    </the-graph-thumb>
+    <canvas id="outcanvas" width="{{width}}" height="{{height}}" style="position:absolute;top:0;left:0;"></canvas>
+    <div id="viewrect"></div>
+  </template>
+  
+</polymer-element>
+
+
+<polymer-element name="noflo-journal" attributes="graph editor panel" assetpath="elements/">
+  <template>
+    <style>
+      #controls {
+        display: block;
+        position: fixed;
+        right: 36px;
+        bottom: 0;
+        width: 288px;
+        height: 180px;
+        color: hsl(189, 50%, 80%);
+        box-sizing: border-box;
+        background-color: hsla(0, 0%, 0%, 0.98) !important;
+        background-image: radial-gradient(1px at 0px 0px, hsl(210, 50%, 60%) 0.5px, hsla(0, 0%, 0%, 0) 1px);
+        background-size: calc(100% - 1px);
+        background-position: 0px -1px;
+        border-top: 1px solid hsla(190, 90%, 80%, 0.3);
+      }
+
+      #controls button {
+        line-height: 36px;
+        border: none;
+        background-color: transparent;
+        font-size: 14px;
+        width: 72px;
+        color: hsl(189, 50%, 80%);
+      }
+      #controls button.undo {
+        position: absolute;
+        left: 0;
+        bottom: 0;
+      }
+      #controls button.redo {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+      }
+      #controls button.disabled {
+        color: rgba(179, 222, 230, 0.2);
+      }
+      #controls button.autolayout {
+        position: absolute;
+        left: calc(50% - 18px);
+        bottom: 0;
+      }
+
+      #nav {
+        position: absolute;
+        left: 0;
+        top: 0;
+      }
+    </style>
+    <div id="controls">
+      <template if="{{ graph }}">
+        <the-graph-nav id="nav" width="288" height="144" editor="{{ editor }}" hide="{{ hidenav }}"></the-graph-nav>
+
+        <button title="Undo" class="undo {{ { disabled: !canUndo } | tokenList }}" on-click="{{ undo }}"><i class="fa fa-undo"></i></button>
+        <template if="{{ klay }}">
+          <button title="Autolayout" class="autolayout" on-click="{{ autolayout }}"><i class="fa fa-magic"></i></button>
+        </template>
+        <button title="Redo" class="redo {{ { disabled: !canRedo } | tokenList }}" on-click="{{ redo }}"><i class="fa fa-repeat"></i></button>
+      </template>
+    </div>
+  </template>
+  
+</polymer-element>
+
+    <noflo-polymer name="noflo-journal" inports="db graph editor panel undo redo" outports=""></noflo-polymer>
+    <polymer-element name="noflo-help" attributes="visible headline text" assetpath="elements/">
+  <template>
+    <style>
+      :host {
+        position: fixed;
+        display: block;
+        bottom: -146px;
+        height: 144px;
+        width: 100%;
+        transition: bottom 0.3s ease-in-out;
+        z-index: 6;
+        background-color: hsl(192, 25%, 92%);
+        padding: 36px 72px 18px 72px;
+        color: black;
+        /*
+        background-image: radial-gradient(2px at 0px 0px, hsl(190, 80%, 30%) 1px, hsla(0, 0%, 0%, 0) 1.1px);
+        background-size: 36px 36px;
+        background-position: 50% 0px;
+        */
+        box-shadow: hsl(189, 47%, 6%) 0px 0px 2px;
+        box-sizing: border-box;
+
+        overflow: auto;
+      }
+      h1 {
+        line-height: 36px;
+        margin: 0px;
+        margin-bottom: 18px;
+        padding: 0px;
+      }
+      p {
+        margin: 0px;
+        padding: 0px;
+        line-height: 24px;
+      }
+      p a {
+        color: hsl(190, 100%, 30%);
+      }
+      #docslink {
+        position: absolute;
+        top: 9px;
+        right: 9px;
+        text-decoration: none;
+      }
+    </style>
+    <h1>{{ headline }}</h1>
+    <p id="help-text"></p>
+    <a id="docslink" href="http://flowhub.io/documentation" title="Documentation, getting started" target="_blank">Docs <i class="fa fa-question-circle"></i></a>
+  </template>
+  
+</polymer-element>
+
+    <script src="browser/noflo-ui.js"></script>
+
+    <link rel="stylesheet" href="css/font-awesome-shadow.css" shim-shadowdom="">
+    <link rel="stylesheet" href="css/noflo-ui.css">
+    <link rel="stylesheet" href="css/noflo-ui-shadow.css" shim-shadowdom="">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, minimal-ui">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="apple-touch-icon" href="app/noflo-60.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="app/noflo-120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="app/noflo-144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="app/noflo-152.png">
+  </head>
+  <body class="noflo loading">
+    <!-- $NOFLO_APP_ANALYTICS -->
+    <div id="loading">Preparing NoFlo UI...</div>
+    <a id="bugreport" href="https://github.com/noflo/noflo-ui/issues" title="Report a bug" target="_blank"><i class="fa fa-bug"></i></a>
+    <a id="openhelp" href="http://flowhub.io/documentation" title="Help" target="_blank"><i class="fa fa-question"></i></a>
+    <noflo-help></noflo-help>
+    <main id="container">
+      <noflo-main></noflo-main>
+      <the-graph-editor></the-graph-editor>
+      <noflo-library></noflo-library>
+      <noflo-context></noflo-context>
+      <noflo-runtime></noflo-runtime>
+      <noflo-journal></noflo-journal>
+      <noflo-component-editor></noflo-component-editor>
+      <noflo-search></noflo-search>
+      <noflo-project></noflo-project>
+      <noflo-packets></noflo-packets>
+    </main>
+    <script type="application/fbp" id="PrepareStorage">
+      INPORT=Open.NAME:NAME
+      OUTPORT=Errors.OUT:ERROR
+      OUTPORT=Open.DB:DB
+
+      # Open database connection
+      Open(indexeddb/Open) ERROR -> IN Errors(core/Merge)
+
+      # Specify storage version to get correct migrations
+      '3' -> VERSION Open
+
+      # Database upgrade setup
+      Open UPGRADE -> UPGRADE Upgrade(indexeddb/UpgradeRouter)
+
+      # ## Version 1
+
+      # Project storage
+      'projects' -> NAME CreateProjects(indexeddb/CreateStore)
+      'id' -> KEYPATH CreateProjects
+      Upgrade VERSIONS -> DB CreateProjects
+      CreateProjects ERROR -> IN Errors
+
+      # Graph storage
+      'graphs' -> NAME CreateGraphs(indexeddb/CreateStore)
+      'id' -> KEYPATH CreateGraphs
+      CreateProjects DB -> DB CreateGraphs
+      CreateGraphs ERROR -> IN Errors
+      'project' -> NAME GraphProject(indexeddb/CreateIndex)
+      'project' -> KEYPATH GraphProject
+      CreateGraphs STORE -> STORE GraphProject
+      # Migrate old LocalStorage data
+      GraphProject STORE -> GRAPHSTORE Migrate(ui/MigrateLocalStorage)
+      GraphProject ERROR -> IN Errors
+
+      # Component storage
+      'components' -> NAME CreateComponents(indexeddb/CreateStore)
+      'id' -> KEYPATH CreateComponents
+      CreateGraphs DB -> DB CreateComponents
+      CreateComponents ERROR -> IN Errors
+      'project' -> NAME ComponentProject(indexeddb/CreateIndex)
+      'project' -> KEYPATH ComponentProject
+      CreateComponents STORE -> STORE ComponentProject
+      ComponentProject ERROR -> IN Errors
+
+      # ## Version 2
+
+      # Runtime storage
+      'runtimes' -> NAME CreateRuntimes(indexeddb/CreateStore)
+      'id' -> KEYPATH CreateRuntimes
+      Upgrade VERSIONS -> DB CreateRuntimes
+      CreateRuntimes ERROR -> IN Errors
+
+      # ## Version 3
+
+      # Journal storage
+      'journals' -> NAME CreateJournals(indexeddb/CreateStore)
+      'id' -> KEYPATH CreateJournals
+      Upgrade VERSIONS -> DB CreateJournals
+      CreateJournals ERROR -> IN Errors
+      'graph' -> NAME JournalGraph(indexeddb/CreateIndex)
+      'graph' -> KEYPATH JournalGraph
+      CreateJournals STORE -> STORE JournalGraph
+      JournalGraph ERROR -> IN Errors
+    </script>
+    <script type="application/fbp" id="LoadData">
+      INPORT=Read.DB:DB
+      INPORT=Start.IN:LOAD
+      OUTPORT=GetProjects.ITEM:PROJECTS
+      OUTPORT=ConvertGraph.OUT:GRAPHS
+      OUTPORT=GetComponents.ITEM:COMPONENTS
+      OUTPORT=GetRuntimes.ITEM:RUNTIMES
+      OUTPORT=Read.COMPLETE:COMPLETE
+      OUTPORT=Errors.OUT:ERROR
+      'readonly' -> DATA HoldMode(core/Kick) OUT -> MODE Read(indexeddb/BeginTransaction)
+      Read ERROR -> IN Errors(core/Merge)
+      Start(core/Repeat) OUT -> IN HoldMode
+      'projects,graphs,components,runtimes' -> DATA HoldStores(core/Kick) OUT -> STORES Read
+      Start OUT -> IN HoldStores
+
+      # Read projects list
+      'projects' -> DATA HoldProjectStore(core/Kick) OUT -> NAME ProjectStore(indexeddb/GetStore)
+      Start OUT -> IN HoldProjectStore
+      Read TRANSACTION -> TRANSACTION ProjectStore
+      '' -> DATA HoldAllProjects(core/Kick) OUT -> ALL GetProjects(indexeddb/Query)
+      Start OUT -> IN HoldAllProjects
+      ProjectStore STORE -> STORE GetProjects
+
+      # Read graphs list
+      'graphs' -> DATA HoldGraphStore(core/Kick) OUT -> NAME GraphStore(indexeddb/GetStore)
+      Start OUT -> IN HoldGraphStore
+      ProjectStore TRANSACTION -> TRANSACTION GraphStore
+      '' -> DATA HoldAllGraphs(core/Kick) OUT -> ALL GetGraphs(indexeddb/Query)
+      GetProjects ITEM -> IN HoldAllGraphs
+      GraphStore STORE -> STORE GetGraphs
+      GetGraphs ITEM -> IN ConvertGraph(graph/LoadJson)
+
+      # Read components list
+      'components' -> DATA HoldComponentStore(core/Kick) OUT -> NAME ComponentStore(indexeddb/GetStore)
+      Start OUT -> IN HoldComponentStore
+      GraphStore TRANSACTION -> TRANSACTION ComponentStore
+      '' -> DATA HoldAllComponents(core/Kick) OUT -> ALL GetComponents(indexeddb/Query)
+      GetProjects ITEM -> IN HoldAllComponents
+      ComponentStore STORE -> STORE GetComponents
+
+      # Read runtimes list
+      'runtimes' -> DATA HoldRuntimeStore(core/Kick) OUT -> NAME RuntimeStore(indexeddb/GetStore)
+      Start OUT -> IN HoldRuntimeStore
+      GraphStore TRANSACTION -> TRANSACTION RuntimeStore
+      '' -> DATA HoldAllRuntimes(core/Kick) OUT -> ALL GetRuntimes(indexeddb/Query)
+      Start OUT -> IN HoldAllRuntimes
+      RuntimeStore STORE -> STORE GetRuntimes
+    </script>
+    <script type="application/fbp" id="StoreGraph">
+      INPORT=Convert.IN:ITEM
+      INPORT=HoldDb.DATA:DB
+      OUTPORT=PutGraph.KEY:KEY
+      'toJSON' -> METHOD Convert(objects/CallMethod)
+      Convert OUT -> IN EnsureId(local/EnsureId) OUT -> IN Disc(core/DisconnectAfterPacket)
+      Disc OUT -> IN SplitGraph(core/Split)
+      SplitGraph OUT -> IN HoldDb(core/Kick) OUT -> DB Read(indexeddb/BeginTransaction)
+      'readwrite' -> DATA HoldMode(core/Kick) OUT -> MODE Read
+      SplitGraph OUT -> IN HoldMode
+      'graphs' -> DATA HoldStore(core/Kick) OUT -> IN SplitStore(core/Split) OUT -> STORES Read
+      SplitGraph OUT -> IN HoldStore
+      SplitStore OUT -> NAME GraphStore(indexeddb/GetStore)
+      Read TRANSACTION -> TRANSACTION GraphStore STORE -> STORE PutGraph(indexeddb/Put)
+      'project' -> KEY GetProject(objects/GetObjectKey)
+      SplitGraph OUT -> IN GetProject OBJECT -> VALUE PutGraph
+      GetProject OUT -> IN DropProject(core/Drop)
+      '' -> DATA HoldProject(core/Kick) OUT -> VALUE SetProject(objects/SetPropertyValue)
+      SplitGraph OUT -> IN HoldProject
+      'project' -> PROPERTY SetProject
+      GetProject MISSED -> IN SetProject OUT -> VALUE PutGraph
+    </script>
+    <script type="application/fbp" id="PrepareProject">
+      INPORT=EnsureId.IN:IN
+      INPORT=SplitDb.IN:DB
+      OUTPORT=SetMain.OUT:OUT
+      OUTPORT=SendGraph.OUT:GRAPH
+      'id' -> KEY GetId(objects/GetObjectKey)
+      'project' -> PROPERTY SetProject(objects/SetPropertyValue)
+      GetId OUT -> VALUE SetProject
+      EnsureId(local/EnsureId) OUT -> IN GetId
+      'name' -> KEY GetName(objects/GetObjectKey)
+      'name' -> PROPERTY SetName(objects/SetPropertyValue)
+      GetName OUT -> VALUE SetName
+      EnsureId OUT -> IN GetName
+      'type' -> KEY GetType(objects/GetObjectKey)
+      'type' -> PROPERTY SetType(objects/SetPropertyValue)
+      GetType OUT -> VALUE SetType
+      EnsureId OUT -> IN GetType
+      EnsureId OUT -> START InitializeGraph(objects/CreateObject)
+      InitializeGraph OUT -> IN GenGraphId(local/EnsureId) OUT -> IN SetName OUT -> IN SetType OUT -> IN SetProject
+      SetProject OUT -> DETAILS ToGraph(graph/CreateGraph)
+      SplitDb(core/Split) OUT -> DB StoreGraph(local/StoreGraph)
+      ToGraph OUT -> ITEM StoreGraph
+      ToGraph OUT -> DATA SendGraph(core/Kick)
+      'main' -> PROPERTY SetMain(objects/SetPropertyValue)
+      StoreGraph KEY -> VALUE SetMain
+      EnsureId OUT -> DATA HoldProject(core/Kick) OUT -> IN SetMain
+      SplitDb OUT -> DB StoreProject(local/StoreProject)
+      SetMain OUT -> ITEM StoreProject
+      StoreGraph KEY -> IN HoldProject
+      StoreProject KEY -> IN SendGraph
+    </script>
+    <script type="application/fbp" id="StoreProject">
+      INPORT=Disc.IN:ITEM
+      INPORT=HoldDb.DATA:DB
+      OUTPORT=PutProject.KEY:KEY
+      Disc(core/DisconnectAfterPacket) OUT -> IN Split(core/Split)
+      Split OUT -> IN HoldDb(core/Kick) OUT -> DB Read(indexeddb/BeginTransaction)
+      'readwrite' -> DATA HoldMode(core/Kick) OUT -> MODE Read
+      Split OUT -> IN HoldMode
+      'projects' -> DATA HoldStore(core/Kick) OUT -> IN SplitStore(core/Split) OUT -> STORES Read
+      Split OUT -> IN HoldStore
+      SplitStore OUT -> NAME Store(indexeddb/GetStore)
+      Read TRANSACTION -> TRANSACTION Store STORE -> STORE PutProject(indexeddb/Put)
+      Split OUT -> VALUE PutProject
+    </script>
+    <script type="application/fbp" id="StoreComponent">
+      INPORT=EnsureId.IN:ITEM
+      INPORT=HoldDb.DATA:DB
+      OUTPORT=Put.KEY:KEY
+      EnsureId(local/EnsureId) OUT -> IN Disc(core/DisconnectAfterPacket)
+      Disc OUT -> IN Split(core/Split)
+      Split OUT -> IN HoldDb(core/Kick) OUT -> DB Read(indexeddb/BeginTransaction)
+      'readwrite' -> DATA HoldMode(core/Kick) OUT -> MODE Read
+      Split OUT -> IN HoldMode
+      'components' -> DATA HoldStore(core/Kick) OUT -> IN SplitStore(core/Split) OUT -> STORES Read
+      Split OUT -> IN HoldStore
+      SplitStore OUT -> NAME Store(indexeddb/GetStore)
+      Read TRANSACTION -> TRANSACTION Store STORE -> STORE Put(indexeddb/Put)
+      Split OUT -> VALUE Put
+    </script>
+    <script type="application/fbp" id="StoreRuntime">
+      INPORT=Disc.IN:ITEM
+      INPORT=HoldDb.DATA:DB
+      OUTPORT=Put.KEY:KEY
+      Disc(core/DisconnectAfterPacket) OUT -> IN Split(core/Split)
+      Split OUT -> IN HoldDb(core/Kick) OUT -> DB Read(indexeddb/BeginTransaction)
+      'readwrite' -> DATA HoldMode(core/Kick) OUT -> MODE Read
+      Split OUT -> IN HoldMode
+      'runtimes' -> DATA HoldStore(core/Kick) OUT -> IN SplitStore(core/Split) OUT -> STORES Read
+      Split OUT -> IN HoldStore
+      SplitStore OUT -> NAME Store(indexeddb/GetStore)
+      Read TRANSACTION -> TRANSACTION Store STORE -> STORE Put(indexeddb/Put)
+      Split OUT -> VALUE Put
+    </script>
+    <script type="application/fbp" id="LoadExample">
+      INPORT=SplitGist.IN:GIST
+      OUTPORT=SetGraphId.OUT:GRAPH
+      OUTPORT=Errors.OUT:ERROR
+      'https://api.github.com/gists' -> STRING GistPrefix(strings/SendString)
+      '/' -> DELIMITER CreateUrl(strings/CompileString)
+      SplitGist(core/Split) OUT -> IN GistPrefix
+      GistPrefix OUT -> IN CreateUrl
+      SplitGist OUT -> IN CreateUrl
+      CreateUrl OUT -> URL GetGist(ajax/GetJsonP)
+      'data' -> KEY GetData(objects/GetObjectKey)
+      'files' -> KEY GetFiles(objects/GetObjectKey)
+      'noflo.json' -> KEY GetFile(objects/GetObjectKey)
+      'content' -> KEY GetFileContent(objects/GetObjectKey)
+      GetGist OUT -> IN GetData
+      GetData OUT -> IN GetFiles OUT -> IN GetFile OUT -> IN GetFileContent
+      GetFiles MISSED -> IN Errors
+      GetFileContent OUT -> IN ParseExample(strings/ParseJson)
+      'id' -> PROPERTY SetGraphId(graph/SetPropertyValue)
+      SplitGist OUT -> VALUE SetGraphId
+      'project' -> PROPERTY RemoveProject(objects/RemoveProperty)
+      ParseExample OUT -> IN ConvertGraph(graph/LoadJson)
+      ConvertGraph OUT -> IN RemoveProject OUT -> IN SetGraphId
+    </script>
+    <script type="application/fbp" id="EnsureId">
+      INPORT=Item.IN:IN
+      OUTPORT=SetId.OUT:OUT
+      'id' -> PROPERTY SetId(objects/SetPropertyValue)
+      Item(core/Repeat) OUT -> START Generate(ui/GenerateId)
+      Generate OUT -> VALUE SetId
+      Item OUT -> IN SetId
+    </script>
+    <script type="application/fbp" id="GithubUpload">
+      INPORT=Repo.IN:REPO
+      INPORT=Token.IN:TOKEN
+      INPORT=Upload.PATH:NAME
+      INPORT=Upload.MESSAGE:MESSAGE
+      INPORT=WaitRepo.STRING:CONTENT
+
+      # Plain repository name for repo creation
+      '(.*)\/(.*)' -> PATTERN RepoName(strings/Replace)
+      '$2' -> REPLACEMENT RepoName
+      Repo(core/Repeat) OUT -> IN RepoName(strings/Replace)
+      RepoName OUT -> DATA StartCreate(core/Kick)
+
+      # Check if repository exists
+      Token(core/Repeat) OUT -> TOKEN CheckRepo
+      Repo OUT -> IN CheckRepo(github/GetRepository)
+      CheckRepo ERROR -> IN StartCreate
+      # If not, we create it
+      Token OUT -> TOKEN CreateRepo(github/CreateRepository)
+      StartCreate OUT -> IN CreateRepo
+
+      # Once we have repository we can upload the document
+      Token OUT -> TOKEN Upload
+      Repo OUT -> REPOSITORY Upload(github/SetContents)
+      WaitRepo(strings/SendString) OUT -> IN Upload
+
+      # Wait until the repository is ready
+      CheckRepo OUT -> IN WaitRepo
+      CreateRepo OUT -> IN WaitRepo
+
+      Upload OUT -> IN Drop(core/Drop)
+    </script>
+    <script type="application/fbp" id="GithubDownload">
+      INPORT=Token.IN:TOKEN
+      INPORT=Repo.IN:REPO
+      INPORT=Project.IN:PROJECT
+      OUTPORT=SetComponentLanguage.OUT:COMPONENT
+      OUTPORT=SetGraphId.OUT:GRAPH
+      OUTPORT=Errors.OUT:ERROR
+
+      # Get project components
+      Token(core/Split) OUT -> TOKEN ListComponents(github/GetContents)
+      Repo(core/Split) OUT -> REPOSITORY ListComponents
+      'false' -> SENDREPO ListComponents
+      ListComponents OUT -> IN Drop(core/Drop)
+      ListComponents ERROR -> IN Drop
+      'components' -> STRING StartComponentList(strings/SendString) OUT -> PATH ListComponents
+      Repo OUT -> IN StartComponentList
+      'path' -> KEY GetComponentPath(objects/GetObjectKey)
+      'false' -> SENDGROUP GetComponentPath
+      ListComponents FILES -> IN GetComponentPath
+      Token OUT -> TOKEN GetComponent(github/GetContents)
+      Repo OUT -> REPOSITORY GetComponent
+      'false' -> SENDREPO GetComponent
+      GetComponentPath OUT -> PATH GetComponent
+      GetComponent OUT -> IN ComponentPath(groups/ReadGroup)
+      '(.*)\/(.*)\.(.*)' -> PATTERN CleanComponentName(strings/Replace)
+      '$2' -> REPLACEMENT CleanComponentName
+      ComponentPath GROUP -> IN CleanComponentName
+      '(.*)\.coffee' -> PATTERN DetectCoffee(strings/Replace)
+      'coffeescript' -> REPLACEMENT DetectCoffee
+      ComponentPath GROUP -> IN DetectCoffee
+      '(.*)\.js' -> PATTERN DetectJavaScript(strings/Replace)
+      'javascript' -> REPLACEMENT DetectJavaScript
+      DetectCoffee OUT -> IN DetectJavaScript
+      'project' -> PROPERTY SetComponentProject(objects/SetPropertyValue)
+      Project(core/Split) OUT -> VALUE SetComponentProject
+      'true' -> KEEP SetComponentProject
+      'code' -> PROPERTY SetComponentCode(objects/SetPropertyValue)
+      ComponentPath OUT -> VALUE SetComponentCode
+      'name' -> PROPERTY SetComponentName(objects/SetPropertyValue)
+      CleanComponentName OUT -> VALUE SetComponentName
+      'language' -> PROPERTY SetComponentLanguage(objects/SetPropertyValue)
+      DetectJavaScript OUT -> VALUE SetComponentLanguage
+      ComponentPath GROUP -> START CreateComponent(objects/CreateObject)
+      CreateComponent OUT -> IN SetComponentProject OUT -> IN SetComponentCode
+      SetComponentCode OUT -> IN SetComponentName OUT -> IN SetComponentLanguage
+
+      # Get project graphs
+      Token(core/Split) OUT -> TOKEN ListGraphs(github/GetContents)
+      Repo(core/Split) OUT -> REPOSITORY ListGraphs
+      'false' -> SENDREPO ListGraphs
+      ListGraphs OUT -> IN Drop(core/Drop)
+      ListGraphs ERROR -> IN Drop
+      'graphs' -> STRING StartGraphList(strings/SendString) OUT -> PATH ListGraphs
+      Repo OUT -> IN StartGraphList
+      'path' -> KEY GetGraphPath(objects/GetObjectKey)
+      'false' -> SENDGROUP GetGraphPath
+      ListGraphs FILES -> IN GetGraphPath
+      Token OUT -> TOKEN GetGraph(github/GetContents)
+      Repo OUT -> REPOSITORY GetGraph
+      'false' -> SENDREPO GetGraph
+      GetGraphPath OUT -> PATH GetGraph
+      GetGraph OUT -> IN GraphPath(groups/ReadGroup)
+      '(.*)\/(.*)\.(.*)' -> PATTERN CleanGraphName(strings/Replace)
+      '$2' -> REPLACEMENT CleanGraphName
+      'project' -> PROPERTY SetGraphProject(graph/SetPropertyValue)
+      Project(core/Split) OUT -> VALUE SetGraphProject
+      'true' -> KEEP SetGraphProject
+      'id' -> PROPERTY SetGraphId(graph/SetPropertyValue)
+      CleanGraphName OUT -> VALUE SetGraphId
+      'name' -> PROPERTY SetGraphName(objects/SetPropertyValue)
+      CleanGraphName OUT -> VALUE SetGraphName
+      GraphPath GROUP -> IN CleanGraphName
+      GraphPath OUT -> IN LoadGraph(graph/LoadGraph)
+      LoadGraph OUT -> IN SetGraphName OUT -> IN SetGraphProject OUT -> IN SetGraphId
+
+      # Error handling
+      GetComponent ERROR -> IN Errors(core/Merge)
+      GetGraph ERROR -> IN Errors(core/Merge)
+      ListComponents ERROR -> IN Errors(core/Merge)
+      ListGraphs ERROR -> IN Errors(core/Merge)
+    </script>
+    <script type="application/fbp" id="Download">
+      INPORT=GetToken.IN:IN
+      OUTPORT=GetProject.OUT:PROJECT
+      OUTPORT=Download.COMPONENT:COMPONENT
+      OUTPORT=Download.GRAPH:GRAPH
+      OUTPORT=Download.ERROR:ERROR
+      'token' -> KEY GetToken(objects/GetObjectKey)
+      'project' -> KEY GetProject(objects/GetObjectKey)
+      'repo' -> KEY GetRepo(objects/GetObjectKey)
+      'id' -> KEY GetProjectId(objects/GetObjectKey)
+      GetToken OBJECT -> IN GetProject
+      GetProject OUT -> IN GetRepo
+      GetRepo OBJECT -> IN GetProjectId
+
+      GetToken OUT -> TOKEN Download(local/GithubDownload)
+      GetProjectId OUT -> PROJECT Download
+      GetRepo OUT -> REPO Download
+    </script>
+    <script type="application/fbp" id="Upload">
+      INPORT=GetToken.IN:IN
+      'token' -> KEY GetToken(objects/GetObjectKey) OUT -> TOKEN Upload(local/GithubUpload)
+      'repo' -> KEY GetRepo(objects/GetObjectKey) OUT -> REPO Upload
+      'doc' -> KEY GetDoc(objects/GetObjectKey) OUT -> IN MakePath(ui/MakePath) OUT -> NAME Upload
+      'message' -> KEY GetMessage(objects/GetObjectKey) OUT -> MESSAGE Upload
+      'content' -> KEY GetContent(objects/GetObjectKey) OUT -> CONTENT Upload
+      GetToken OBJECT -> IN GetRepo OBJECT -> IN GetDoc OBJECT -> IN GetMessage OBJECT -> IN GetContent
+    </script>
+    <script type="application/fbp" id="ProjectContext">
+      INPORT=Context.PROJECT:PROJECT
+      INPORT=Context.GRAPHS:GRAPHS
+      INPORT=Context.COMPONENT:COMPONENT
+      INPORT=Runtimes.IN:RUNTIMES
+      INPORT=Context.CLEAR:CLEAR
+      INPORT=Project.GITHUBTOKEN:GITHUBTOKEN
+      INPORT=Journal.DB:DB
+      INPORT=Theme.IN:THEME
+      OUTPORT=ListenGraph.OUT:GRAPHCHANGED
+      OUTPORT=ComponentEditor.CHANGED:COMPONENTCHANGED
+      OUTPORT=MergeNewGraph.OUT:NEWGRAPH
+      OUTPORT=Project.NEWCOMPONENT:NEWCOMPONENT
+      OUTPORT=Project.CHANGED:PROJECTCHANGED
+      OUTPORT=RuntimeChanged.OUT:RUNTIMECHANGED
+      OUTPORT=Runtime.RUNTIME:RUNTIME
+      OUTPORT=Project.UPLOAD:UPLOAD
+      'noflo-context' -> SELECTOR Context(polymer/noflo-context)
+
+      # Runtime handling
+      Runtimes(core/Split) OUT -> RUNTIMES Runtime
+      Runtimes OUT -> RUNTIMES Context
+      Context GRAPHS -> GRAPHS Runtime(local/HandleRuntime)
+      Context EDGES -> EDGES Runtime
+      Runtime CHANGED -> IN RuntimeChanged(core/Merge)
+      Runtime RUNTIME -> RUNTIME Context
+
+      # Search handling
+      'noflo-search' -> SELECTOR Search(polymer/noflo-search)
+      Runtimes OUT -> RUNTIMES Search
+      Context GRAPHS -> GRAPHS Search
+      Context COMPONENT -> COMPONENT Search
+      Context PROJECT -> PROJECT Search
+
+      's' -> KEYS Shortcuts(interaction/ListenKeyboardShortcuts)
+      Shortcuts SHORTCUT -> TOGGLE Search
+
+      # Journal history handling
+      'noflo-journal' -> SELECTOR Journal(polymer/noflo-journal)
+      Context CURRENTGRAPH -> GRAPH Journal
+      #'z' -> KEYS Shortcuts
+      #Shortcuts SHORTCUT -> UNDO Journal
+      #'r' -> KEYS Shortcuts
+      #Shortcuts SHORTCUT -> REDO Journal
+
+      # Panel handling
+      'noflo-packets' -> SELECTOR Packets(polymer/noflo-packets)
+      '' -> GETPANEL Context TOOLPANEL -> PANEL Runtime
+      Context CONTEXTPANEL -> PANEL Search
+      Context CONTEXTPANEL -> PANEL Packets
+
+      # Library handling
+      'noflo-library' -> SELECTOR Library(polymer/noflo-library)
+      Context PROJECT -> PROJECT Library
+      Context GRAPHS -> GRAPHS Library
+
+      # UI searching
+      Search SEARCH -> SEARCH Library RESULT -> RESULTS Search
+      Search SEARCH -> SEARCH Context RESULT -> RESULTS Search
+
+      # Project menu
+      'noflo-project' -> SELECTOR Project(polymer/noflo-project)
+      Runtimes OUT -> RUNTIMES Project
+      Runtime RUNTIME -> RUNTIME Project
+      Context PROJECT -> PROJECT Project
+      Context GRAPHS -> GRAPHS Project
+      Context COMPONENT -> COMPONENT Project
+      Project NEWGRAPH -> IN MergeNewGraph(core/Merge)
+      Context NEWGRAPH -> IN MergeNewGraph
+
+      # Prepare graph editor
+      Context CURRENTGRAPH -> CURRENTGRAPH GraphEditor(local/GraphEditor)
+      Theme(core/Repeat) OUT -> THEME GraphEditor
+      Runtime RUNTIME -> RUNTIME GraphEditor
+      Context NEWGRAPH -> NEWGRAPH GraphEditor
+      Context EXAMPLE -> EXAMPLE GraphEditor
+      Context PROJECT -> PROJECT GraphEditor
+      GraphEditor EDITOR -> EDITOR Library
+      GraphEditor EDITOR -> EDITOR Context
+      GraphEditor EDGES -> EDGES Context
+      GraphEditor NODES -> NODES Context
+      GraphEditor EDITOR -> EDITOR Journal
+      GraphEditor RUNTIMECHANGED -> IN RuntimeChanged
+
+
+      # Prepare component editor
+      'noflo-component-editor' -> SELECTOR ComponentEditor(polymer/noflo-component-editor)
+      Context COMPONENT -> COMPONENT ComponentEditor
+      Theme OUT -> THEME ComponentEditor
+
+      # Listen for graph changes
+      Context CURRENTGRAPH -> IN ListenGraph(graph/ListenChanges)
+      Runtime RUNTIME -> RUNTIME SendGraphChanges(runtime/SendGraphChanges)
+      Context CURRENTGRAPH -> GRAPH SendGraphChanges
+
+      # Listen for network packets
+      Context EDGES -> EDGES Packets
+      Runtime RUNTIME -> RUNTIME Packets
+      GraphEditor PACKET -> PACKET Packets
+      Context CURRENTGRAPH -> CURRENTGRAPH Packets
+
+      # Listen for screen size changes and communicate with editors
+      '' -> START ListenWindow(interaction/ListenResize)
+      ListenWindow WIDTH -> WIDTH GraphEditor
+      ListenWindow HEIGHT -> HEIGHT GraphEditor
+      ListenWindow WIDTH -> WIDTH ComponentEditor
+      ListenWindow HEIGHT -> HEIGHT ComponentEditor
+    </script>
+    <script type="application/fbp" id="GraphEditor">
+      INPORT=ConnectRuntime.RUNTIME:RUNTIME
+      INPORT=ConnectRuntime.PROJECT:PROJECT
+      INPORT=ConnectRuntime.NEWGRAPH:NEWGRAPH
+      INPORT=ConnectRuntime.EXAMPLE:EXAMPLE
+      INPORT=Graph.IN:CURRENTGRAPH
+      INPORT=GraphEditor.WIDTH:WIDTH
+      INPORT=GraphEditor.HEIGHT:HEIGHT
+      INPORT=GraphEditor.THEME:THEME
+      OUTPORT=Async.OUT:EDITOR
+      OUTPORT=ConnectRuntime.PACKET:PACKET
+      OUTPORT=GraphEditor.EDGES:EDGES
+      OUTPORT=GraphEditor.NODES:NODES
+      OUTPORT=ConnectRuntime.RUNTIME:RUNTIMECHANGED
+      'the-graph-editor' -> SELECTOR GraphEditor(polymer/the-graph-editor)
+      Graph(core/Repeat) OUT -> START EmptyLibrary(objects/CreateObject)
+      EmptyLibrary OUT -> LIBRARY GraphEditor
+      Graph(core/Repeat) OUT -> GRAPH GraphEditor
+      GraphEditor ELEMENT -> IN Async(core/RepeatAsync)
+      Async OUT -> EDITOR ConnectRuntime(ui/ConnectRuntime)
+    </script>
+    <script type="application/fbp" id="HandleRuntime">
+      INPORT=RuntimeElement.GRAPHS:GRAPHS
+      INPORT=RuntimeElement.EDGES:EDGES
+      INPORT=RuntimeElement.PANEL:PANEL
+      INPORT=RuntimeElement.RUNTIMES:RUNTIMES
+      OUTPORT=Connect.RUNTIME:RUNTIME
+      OUTPORT=RuntimeElement.CHANGED:CHANGED
+
+      'noflo-runtime' -> SELECTOR RuntimeElement(polymer/noflo-runtime)
+      'body' -> SELECTOR GetParent(dom/GetElement) ELEMENT -> ELEMENT Connect(runtime/ConnectRuntime)
+      RuntimeElement RUNTIME -> DEFINITION Connect
+      Connect RUNTIME -> RUNTIME RuntimeElement
+    </script>
+    <script type="application/fbp" id="LoadRouteData">
+      INPORT=GetNode.ROUTE:ROUTE
+      INPORT=GetNode.PROJECTS:PROJECTS
+      INPORT=GetSource.RUNTIME:RUNTIME
+      OUTPORT=GetNode.PROJECT:PROJECT
+      OUTPORT=MergeGraphs.OUT:GRAPH
+      OUTPORT=MergeComponents.OUT:COMPONENT
+
+      # Locally available graphs and components
+      GetNode(ui/GetNode) GRAPH -> IN MergeGraphs(core/Merge)
+      GetNode COMPONENT -> IN MergeComponents(core/Merge)
+
+      # Example handling
+      GetNode EXAMPLE -> GIST LoadExample(local/LoadExample)
+      LoadExample GRAPH -> IN MergeGraphs
+
+      # Runtime component handling
+      GetNode RUNTIME -> NAME GetSource(runtime/GetSource)
+      'true' -> VALUE SetReadOnly(objects/SetPropertyValue)
+      'readonly' -> PROPERTY SetReadOnly
+      'true' -> KEEP SetReadOnly
+      GetSource SOURCE -> IN SetReadOnly OUT -> IN MergeComponents
+      GetSource ERROR -> IN Drop(core/Drop)
+    </script>
+    <script type="application/fbp" id="main">
+      # Name of our IndexedDB database
+      'noflo-ui' -> NAME Storage(local/PrepareStorage)
+
+      # Prepare the main view
+      'noflo-main' -> SELECTOR Main(polymer/noflo-main)
+      '' -> PREPAREDEFAULTS Main
+
+      # Pass database connection to persistence handlers
+      Storage DB -> DB LoadData(local/LoadData)
+      Storage DB -> DB StoreProject(local/StoreProject)
+      Storage DB -> DB PrepareProject(local/PrepareProject)
+      Storage DB -> DB StoreComponent(local/StoreComponent)
+      Storage DB -> DB StoreGraph(local/StoreGraph)
+      Storage DB -> DB StoreRuntime(local/StoreRuntime)
+      Storage DB -> IN DatabaseReady(ui/DatabaseReady)
+      Storage ERROR -> IN ShowErrors(core/Output)
+
+      # Start by loading user's local data
+      '' -> LOAD LoadData
+      LoadData ERROR -> IN ShowErrors
+      LoadData PROJECTS -> PROJECTS Main
+      LoadData GRAPHS -> GRAPHS Main
+      LoadData COMPONENTS -> COMPONENTS Main
+      LoadData RUNTIMES -> RUNTIMES Main
+
+      # Handle data changes from main
+      Main NEWPROJECT -> IN PrepareProject OUT -> PROJECTS Main
+      PrepareProject GRAPH -> GRAPHS Main
+      PrepareProject OUT -> DATA HoldNewProject(core/Kick) OUT -> CREATEDPROJECT Main
+      PrepareProject GRAPH -> IN HoldNewProject
+      Main RUNTIME -> ITEM StoreRuntime
+
+      # Prepare the context
+      Router(ui/Router) ROUTE -> CLEAR Context(local/ProjectContext)
+      Storage DB -> DB Context
+      Main RUNTIMES -> RUNTIMES Context
+      Router ROUTE -> ROUTE RouteData(local/LoadRouteData)
+      Main PROJECTS -> PROJECTS RouteData
+      RouteData PROJECT -> PROJECT Context
+      RouteData GRAPH -> GRAPHS Context
+      RouteData COMPONENT -> COMPONENT Context
+      Main THEME -> THEME Context
+      Context COMPONENTCHANGED -> ITEM StoreComponent
+      Context COMPONENTCHANGED -> COMPONENTS Main
+      Context GRAPHCHANGED -> IN Check(ui/IgnoreExamples) OUT -> ITEM StoreGraph
+      Context PROJECTCHANGED -> ITEM StoreProject
+      Context RUNTIME -> RUNTIME RouteData
+      Context RUNTIMECHANGED -> ITEM StoreRuntime
+      Context NEWGRAPH -> IN Check(ui/IgnoreExamples) OUT -> ITEM StoreGraph
+      Context NEWCOMPONENT -> ITEM StoreComponent
+
+      # Handle GitHub tokens
+      '' -> TOKEN Main GITHUBTOKEN -> GITHUBTOKEN Context
+      Main DOWNLOAD -> IN Download(local/Download)
+      Download PROJECT -> ITEM StoreProject
+      Download PROJECT -> PROJECTS Main
+      Download GRAPH -> ITEM StoreGraph
+      Download GRAPH -> GRAPHS Main
+      Download COMPONENT -> ITEM StoreComponent
+      Download COMPONENT -> COMPONENTS Main
+      Download ERROR -> IN ShowErrors
+      Context UPLOAD -> IN Upload(local/Upload)
+
+      # Show/hide main widget
+      'true' -> DATA ShowMain(core/Kick) OUT -> OPEN Main
+      'false' -> DATA HideMain(core/Kick) OUT -> OPEN Main
+      Router MAIN -> IN ShowMain
+      Router ROUTE -> IN HideMain
+      Router RUNTIME -> LOCALRUNTIME Main
+
+      # Routing
+      LoadData COMPLETE -> START ListenHash(interaction/ListenHash)
+      ListenHash INITIAL -> URL Router
+      ListenHash CHANGE -> URL Router
+    </script>
+    <script src="app/noflo.js"></script>
+  <script src="index.js"></script></body>
+</html>
